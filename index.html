@@ -335,7 +335,20 @@ button{ font-family:inherit; cursor:pointer; }
     </div>
   </section>
 
-  <!-- ===================== 6. FASE DE BÚSQUEDA — PASO A (VIERNES, tarde) ===================== -->
+  <!-- ===================== 6. FASE DE BÚSQUEDA — LLEGADA AL PASAJE (VIERNES, tarde) ===================== -->
+  <section class="screen" data-screen="searchLlegada">
+    <div class="day-header">VIERNES — tarde</div>
+    <h2>De vuelta en Cervantes</h2>
+    <div class="placeholder">[IMG: llegada al Pasaje Cervantes de día, se ve el inicio de Bellas Artes sede Ayacucho a un lado y los bares del pasaje al otro]</div>
+    <p>Majo vuelve a Cervantes. Desde la entrada del pasaje ve la puerta de Bellas Artes a un
+      lado y los bares al otro. ¿Por dónde empieza a preguntar?</p>
+    <div class="branch-grid">
+      <button onclick="showScreen('searchA')">Subir a Bellas Artes</button>
+      <button onclick="showScreen('searchC')">Preguntar en los bares del pasaje</button>
+    </div>
+  </section>
+
+  <!-- ===================== PASO A (VIERNES, tarde) — Bellas Artes ===================== -->
   <section class="screen" data-screen="searchA">
     <div class="day-header">VIERNES — tarde</div>
     <h2>Bellas Artes</h2>
@@ -703,7 +716,7 @@ function renderMesa(){
 // La mesa es solo exploración: acá no hay ninguna decisión. Este botón
 // es el único que saca al jugador del hub, hacia la fase de búsqueda.
 function leaveMesa(){
-  showScreen('searchA');
+  showScreen('searchLlegada');
 }
 
 /* ---------------------------------------------------------------------
