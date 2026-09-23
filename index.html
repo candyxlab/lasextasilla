@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La sexta silla — Prototipo</title>
+<style>
+/* =====================================================================
+   LA SEXTA SILLA — prototipo funcional-minimalista, un solo archivo.
+   Paleta tomada de la biblia del ecosistema (fondo oscuro + acento magenta).
+   Nada de imágenes reales: todo lo visual es un placeholder con etiqueta.
+   ===================================================================== */
+:root{
+  --bg:#141414;
+  --bg-panel:#1c1c1c;
+  --text:#e8dbc0;      /* papel viejo */
+  --muted:#a99567;     /* papel oxidado apagado, para texto secundario */
+  --accent:#8B1E3F;    /* magenta apagado del moodboard */
+  --accent-light:#b5395c;
+  --border:#3a3a3a;
+  --cian:#5fd6e0;       /* EXCLUSIVO del retrato uncanny de Juana */
+  --ok:#6B6B5A;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:Georgia, 'Times New Roman', serif;
+  line-height:1.5;
+  min-height:100vh;
+}
+h1,h2,h3{ font-family:Georgia, serif; letter-spacing:0.02em; }
+button{ font-family:inherit; cursor:pointer; }
+.hidden{ display:none !important; }
+
+/* ---------- estructura general ---------- */
+#app{ max-width:920px; margin:0 auto; padding:20px 18px 60px; }
+
+.topbar{
+  display:flex; justify-content:space-between; align-items:center;
+  gap:10px; flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  padding-bottom:10px; margin-bottom:22px;
+}
+.topbar .brand{ font-size:0.95rem; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase; }
+.topbar .stats{ font-size:0.8rem; color:var(--muted); display:flex; gap:14px; align-items:center; }
+.btn-restart{
+  background:transparent; color:var(--accent-light); border:1px solid var(--accent);
+  padding:5px 10px; border-radius:3px; font-size:0.75rem;
+}
+.btn-restart:hover{ background:var(--accent); color:#fff; }
+
+.screen{ display:none; animation:fadein .25s ease; }
+.screen.active{ display:block; }
+@keyframes fadein{ from{opacity:0;} to{opacity:1;} }
+
+/* ---------- botones de navegación ---------- */
+.nav-row{ display:flex; justify-content:space-between; margin-top:28px; gap:10px; }
+.btn{
+  background:var(--accent); color:#fff; border:none; padding:10px 18px;
+  border-radius:3px; font-size:0.95rem;
+}
+.btn:hover{ background:var(--accent-light); }
+.btn.secondary{ background:transparent; border:1px solid var(--muted); color:var(--muted); }
+.btn.secondary:hover{ border-color:var(--text); color:var(--text); }
+.btn:disabled{ opacity:0.4; cursor:not-allowed; }
+
+/* ---------- placeholders de imagen ---------- */
+.placeholder{
+  border:2px dashed #666;
+  background:repeating-linear-gradient(45deg,#232323,#232323 10px,#1a1a1a 10px,#1a1a1a 20px);
+  color:#999;
+  text-align:center;
+  padding:26px 10px;
+  font-family:monospace;
+  font-size:0.85rem;
+  border-radius:4px;
+  margin-bottom:10px;
+}
+.placeholder.small{ padding:14px 8px; font-size:0.75rem; }
+
+/* ---------- audio simulado ---------- */
+.audio-wrap{ margin:10px 0; }
+.audio-btn{
+  background:var(--bg-panel); color:var(--text); border:1px solid var(--accent);
+  padding:8px 12px; border-radius:20px; font-size:0.85rem;
+}
+.audio-btn:hover{ background:var(--accent); }
+.audio-btn:disabled{ opacity:0.6; }
+.audio-text{
+  margin-top:10px; padding:10px 12px; border-left:3px solid var(--accent);
+  background:var(--bg-panel); font-style:italic;
+}
+
+/* ---------- portada ---------- */
+.portada{ text-align:center; padding:60px 10px 30px; }
+.portada h1{ font-size:2.6rem; color:var(--accent-light); margin-bottom:6px; letter-spacing:0.05em; }
+.portada .subt{ color:var(--muted); margin-bottom:34px; }
+.silla-icon{ font-size:3rem; margin-bottom:18px; }
+
+/* ---------- chat whatsapp ---------- */
+.chat-window{ background:#0c1712; border-radius:6px; border:1px solid var(--border); overflow:hidden; }
+.chat-header{ background:#1f2c26; padding:10px 14px; font-size:0.9rem; color:#cfe; }
+.chat-body{ padding:14px; display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto; }
+.bubble{ max-width:75%; padding:8px 12px; border-radius:10px; font-size:0.9rem; }
+.bubble.me{ background:#245c43; align-self:flex-end; color:#eafff2; }
+.bubble.other{ background:#26302c; align-self:flex-start; color:#e8dbc0; }
+.bubble .who{ display:block; font-size:0.7rem; color:var(--accent-light); margin-bottom:2px; }
+
+/* ---------- la mesa (hub) ---------- */
+.mesa-scene{ position:relative; width:100%; aspect-ratio:16/9; margin-bottom:20px; }
+.mesa-scene .placeholder{ position:absolute; inset:0; margin:0; display:flex; align-items:center; justify-content:center; padding:10px; }
+.hotspot{
+  position:absolute; transform:translate(-50%,-50%);
+  background:rgba(20,20,20,0.75); border:1.5px solid var(--accent-light);
+  color:var(--text); padding:6px 10px; border-radius:20px; font-size:0.78rem;
+  white-space:nowrap;
+}
+.hotspot:hover{ background:var(--accent); }
+.hotspot.visited{ border-color:var(--ok); background:rgba(107,107,90,0.55); }
+.hotspot.visited::after{ content:" ✓"; }
+.hotspot.object{ border-style:dashed; }
+
+.hub-intro{ color:var(--muted); font-size:0.9rem; margin-bottom:14px; font-style:italic; }
+
+.notas-panel{
+  background:var(--bg-panel); border:1px solid var(--border); border-radius:6px;
+  padding:14px 16px; margin:18px 0;
+}
+.notas-panel h3{ margin:0 0 8px; font-size:1rem; color:var(--accent-light); }
+.notas-panel ul{ margin:0; padding-left:18px; font-size:0.88rem; color:var(--text); }
+.notas-panel .empty{ color:var(--muted); font-style:italic; font-size:0.88rem; }
+
+.decision-box{
+  border:1px solid var(--accent); border-radius:6px; padding:16px; margin-top:24px;
+  background:linear-gradient(180deg, rgba(139,30,63,0.08), transparent);
+}
+.decision-box h3{ margin:0 0 4px; color:var(--accent-light); }
+.decision-box .hint{ color:var(--muted); font-size:0.82rem; margin-bottom:14px; }
+.decision-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:520px){ .decision-grid{ grid-template-columns:1fr; } }
+.decision-grid button{
+  background:var(--bg-panel); color:var(--text); border:1px solid var(--muted);
+  padding:12px 10px; border-radius:4px; font-size:0.9rem; text-align:left;
+}
+.decision-grid button:hover{ border-color:var(--accent-light); color:var(--accent-light); }
+
+.finals-legend{ display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:14px; font-size:0.8rem; color:var(--muted); }
+.finals-legend span.seen{ color:var(--ok); }
+
+/* ---------- modal ---------- */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,0.75);
+  display:flex; align-items:center; justify-content:center; padding:16px; z-index:50;
+}
+.modal-box{
+  background:var(--bg-panel); border:1px solid var(--accent); border-radius:8px;
+  max-width:480px; width:100%; padding:22px; position:relative; max-height:88vh; overflow-y:auto;
+}
+.modal-close{
+  position:absolute; top:8px; right:10px; background:none; border:none; color:var(--muted);
+  font-size:1.2rem;
+}
+.modal-close:hover{ color:var(--text); }
+.modal-box h3{ margin-top:0; color:var(--accent-light); }
+.nitidez-tag{ display:inline-block; font-size:0.72rem; color:var(--muted); margin-bottom:10px; }
+.silencio{ font-size:1.6rem; letter-spacing:0.3em; color:var(--muted); text-align:center; margin:20px 0 6px; }
+.cian-note{ color:var(--cian); font-size:0.78rem; }
+
+/* ---------- finales ---------- */
+.final-title{ color:var(--accent-light); font-size:1.6rem; margin-bottom:4px; }
+.final-verdad-oculta{ display:none; } /* nunca se muestra: recordatorio de que no se revela fuera del texto de crónica */
+.final-text{ font-size:1rem; margin:16px 0; }
+.final-instruction{
+  border:1px dashed var(--accent); padding:12px 14px; border-radius:6px;
+  color:var(--accent-light); font-family:monospace; margin:18px 0;
+}
+.final-repeat{ color:var(--muted); font-style:italic; font-size:0.85rem; }
+.final-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; }
+
+/* ---------- howto ---------- */
+.rules-list{ padding-left:20px; }
+.rules-list li{ margin-bottom:10px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Barra superior: se oculta en la portada, visible en el resto -->
+  <div class="topbar" id="topbar" hidden>
+    <div class="brand">La sexta silla · prototipo</div>
+    <div class="stats">
+      <span id="stat-explorados"></span>
+      <span id="stat-finales"></span>
+      <button class="btn-restart" onclick="restartGame()">Volver a empezar</button>
+    </div>
+  </div>
+
+  <!-- ============================= 0. PORTADA ============================= -->
+  <section class="screen active" data-screen="portada">
+    <div class="portada">
+      <div class="silla-icon">🪑</div>
+      <h1>LA SEXTA SILLA</h1>
+      <p class="subt">Majo no recuerda la noche. Vos sí puedes reconstruirla.</p>
+      <div class="placeholder">[IMG: mesa de bar, seis puestos servidos, pátina análoga nocturna]</div>
+      <button class="btn" onclick="startGame()">Empezar</button>
+    </div>
+  </section>
+
+  <!-- ===================== 1. LA MAÑANA PERDIDA ===================== -->
+  <section class="screen" data-screen="morning">
+    <h2>La mañana perdida</h2>
+    <p>Majo se despierta. Faltan tres días para la muestra y no tiene ni idea de qué pasó anoche.
+      Sabe que estuvo en Cervantes, con los de siempre. Todo se siente borroso — habrán mezclado
+      mucho trago.</p>
+    <div class="placeholder">[IMG: cuarto de Majo, luz de mañana, ventilador, reja de la ventana]</div>
+    <p style="color:var(--muted); font-size:0.9rem;">Toca algo del cuarto.</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+      <button class="btn secondary" onclick="openMorningClue('escritorio')">El escritorio</button>
+      <button class="btn secondary" onclick="openMorningClue('maleta')">La maleta</button>
+      <button class="btn secondary" onclick="openMorningClue('transporte')">El teléfono</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn secondary" onclick="showScreen('portada')">Volver</button>
+      <button class="btn" onclick="showScreen('chat')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== 2. CHAT DE WHATSAPP ===================== -->
+  <section class="screen" data-screen="chat">
+    <h2>El chat</h2>
+    <div class="chat-window">
+      <div class="chat-header">bizcochitos 💀 · 5 en línea</div>
+      <div class="chat-body">
+        <div class="bubble me"><span class="who">Majo</span>oigan alguien vio mi cuaderno?? el de dibujo</div>
+        <div class="bubble other"><span class="who">Val</span>no lo dejaste donde la pelada?</div>
+        <div class="bubble me"><span class="who">Majo</span>cuál pelada</div>
+        <div class="bubble other"><span class="who">Milo</span>la que se sentó con nosotros ni te acuerdas jajaja</div>
+        <div class="bubble other"><span class="who">Alejo</span>se lo prestaste vos misma parce</div>
+        <div class="bubble me"><span class="who">Majo</span>no me acuerdo de nada mk</div>
+        <div class="bubble other"><span class="who">Sofi</span>yo tampoco muy bien la verdad, estaba prendidísima</div>
+        <div class="bubble me"><span class="who">Majo</span>cómo se llamaba</div>
+        <div class="bubble other"><span class="who">Val</span>juana creo</div>
+        <div class="bubble me"><span class="who">Majo</span>quién es juana</div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn secondary" onclick="showScreen('morning')">Volver</button>
+      <button class="btn" onclick="showScreen('howto')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== 3. ¿CÓMO INVESTIGAR? ===================== -->
+  <section class="screen" data-screen="howto">
+    <h2>¿Cómo investigar?</h2>
+    <p>Vas a volver a la mesa de esa noche. No hay un orden correcto.</p>
+    <ul class="rules-list">
+      <li><strong>Explora.</strong> Toca a cada persona y cada objeto de la mesa. Nadie te va a repetir lo que ya sabés.</li>
+      <li><strong>Compara.</strong> Nadie te va a resumir las versiones. Sos vos quien nota si algo no cuadra.</li>
+      <li><strong>Vuelve.</strong> No todo se entera a la primera. Hay gente a la que conviene preguntarle dos veces.</li>
+      <li><strong>Decide.</strong> Cuando quieras — no hace falta explorar todo — decidís qué hace Majo.</li>
+      <li><strong>Descubre.</strong> Cada decisión te lleva a un final distinto, y cada final te manda a una página del fanzine.</li>
+    </ul>
+    <div class="nav-row">
+      <button class="btn secondary" onclick="showScreen('chat')">Volver</button>
+      <button class="btn" onclick="showScreen('mesa')">Ir a la mesa</button>
+    </div>
+  </section>
+
+  <!-- ===================== 4. LA MESA (HUB) ===================== -->
+  <section class="screen" data-screen="mesa">
+    <h2>La mesa</h2>
+    <p class="hub-intro" id="hub-intro-text"></p>
+
+    <div class="mesa-scene">
+      <div class="placeholder">[IMG: la mesa — Alejo, Juana, Majo, Milo, Val y Sofi sentados; Don Mario en su esquina; CCTV en la pared; Torres de Bomboná al fondo]</div>
+      <!-- Personas, de izquierda a derecha según la ficha física de la biblia -->
+      <button class="hotspot" style="left:10%; top:58%;" data-key="alejo">Alejo</button>
+      <button class="hotspot" style="left:26%; top:56%;" data-key="juana">Juana</button>
+      <button class="hotspot" style="left:42%; top:60%;" data-key="majo">Majo</button>
+      <button class="hotspot" style="left:58%; top:56%;" data-key="milo">Milo</button>
+      <button class="hotspot" style="left:74%; top:58%;" data-key="val">Val</button>
+      <button class="hotspot" style="left:90%; top:60%;" data-key="sofi">Sofi</button>
+      <!-- Objetos -->
+      <button class="hotspot object" style="left:42%; top:80%;" data-key="sketchbook">Sketchbook</button>
+      <button class="hotspot object" style="left:80%; top:16%;" data-key="cctv">Cámara CCTV</button>
+      <button class="hotspot object" style="left:14%; top:14%;" data-key="donmario">Don Mario</button>
+    </div>
+
+    <div class="notas-panel">
+      <h3>Notas de Majo</h3>
+      <div id="notas-content"><span class="empty">(en blanco todavía — escuchá a alguien)</span></div>
+    </div>
+
+    <div class="decision-box">
+      <h3>¿Qué hace Majo?</h3>
+      <p class="hint">Podés decidir en cualquier momento. No hace falta haber hablado con todos.</p>
+      <div class="decision-grid">
+        <button onclick="goToEnding('cuaderno')">Rendirse, dejar de buscar</button>
+        <button onclick="goToEnding('silla')">Ver las cámaras del bar</button>
+        <button onclick="goToEnding('esquina')">Insistirle a Don Mario</button>
+        <button onclick="goToEnding('muestra')">Buscar con calma</button>
+      </div>
+      <div class="finals-legend" id="finals-legend"></div>
+    </div>
+  </section>
+
+  <!-- ===================== FINALES (pantalla dinámica) ===================== -->
+  <section class="screen" data-screen="final">
+    <h2 class="final-title" id="final-title"></h2>
+    <div class="placeholder" id="final-image"></div>
+    <p class="final-text" id="final-text"></p>
+    <p class="final-repeat hidden" id="final-repeat">Ya habías llegado a este final antes.</p>
+    <div class="final-instruction" id="final-instruction"></div>
+    <div class="final-actions">
+      <button class="btn secondary" onclick="showScreen('mesa')">Volver a la mesa</button>
+      <button class="btn" onclick="restartGame()">Volver a empezar</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===================== MODAL (testimonios, pistas, Don Mario) ===================== -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   ESTADO DEL JUEGO
+   Todo vive en memoria (variables JS). No se usa localStorage: al
+   recargar la página el prototipo vuelve a cero, tal como pide el brief.
+   Si en el futuro se agrega persistencia, debe ir envuelta en try/catch.
+   ===================================================================== */
+
+// Contador de partidas jugadas en esta misma sesión (no se resetea con
+// "Volver a empezar"): sirve para que algunos textos se sientan distintos
+// en la 2ª/3ª vuelta, sin revelar nunca los secretos prohibidos.
+let playthroughCount = 0;
+
+// endingsSeen y esto también persisten entre reinicios: representan el
+// progreso acumulado del jugador ("finales descubiertos: X/4").
+let endingsSeen = new Set();
+
+// Estado de una partida (esto SÍ se reinicia con "Volver a empezar").
+let state = null;
+
+function freshState(){
+  return {
+    visited: { alejo:false, sofi:false, milo:false, val:false, majo:false, juana:false,
+               sketchbook:false, cctv:false, donmario:false },
+    donMarioVisits: 0,
+    currentEnding: null
+  };
+}
+state = freshState();
+
+const HOTSPOT_KEYS = Object.keys(freshState().visited);
+
+/* ---------------------------------------------------------------------
+   CONTENIDO — testimonios (texto EXACTO tomado de la biblia, §8)
+   --------------------------------------------------------------------- */
+const TESTIMONIOS = {
+  val:   { nombre:'Val',   nitidez:'nítida',           texto:'"Se nos sentó una pelada en la acera, Juana se llamaba. Ya como a las tres cada uno pidió su carro y se fue."',
+           nota:'Alguien se llamaba Juana. Se fueron en carro como a las tres.' },
+  milo:  { nombre:'Milo',  nitidez:'medio enfocada',   texto:'"Esa pelada llegó cuando ya llevábamos rato. Se puso a hablar de la obra con nosotros."',
+           nota:'Esa pelada llegó cuando ya llevaban rato hablando de la obra.' },
+  alejo: { nombre:'Alejo', nitidez:'medio enfocada',   texto:'"Me acuerdo que Majo estaba dibujando a la pelada. En algún momento ya no estaba."',
+           nota:'Majo la estaba dibujando. En algún momento ya no estaba.' },
+  sofi:  { nombre:'Sofi',  nitidez:'bastante borrosa', texto:'"Yo estaba prendidísima esa noche. Sé que alguien se fue con ella, pero no te sabría decir bien."',
+           nota:'Alguien se fue con ella. Sofi no sabría decir quién.' },
+  majo:  { nombre:'Majo',  nitidez:'bastante borrosa', texto:'"Las primeras horas me acuerdo. Después ya no. Ni siquiera sé cómo llegué a mi casa."',
+           nota:'Laguna después de cierta hora. No sabe cómo llegó a su casa.' }
+};
+
+const DONMARIO_AUDIO_1 = '"…yo a usté la conozco de otra vida, mija… aquí todos ya se murieron una vez y no se han dado cuenta…"';
+const DONMARIO_AUDIO_2 = '"…la pelada que buscás… esa ya no baja caminando, esa baja de otra forma… y usté tampoco, pero eso lo entiende después."';
+
+const ENDINGS = {
+  cuaderno: {
+    title: 'El cuaderno cerrado',
+    text: 'Majo deja de buscar. El viernes se va a parchar con quien la invite, sin pensar más en el cuaderno perdido. El lunes compra uno nuevo y empieza a dibujar otra cosa. Nadie vuelve a mencionar a la pelada de la obra; con el tiempo, ni siquiera Val está del todo segura de haberla visto. Algunas caras se apagan solas, sin que nadie note el momento exacto.',
+    instruction: 'Hay una pista escondida en tu fanzine. Búscala.',
+    img: '[IMG: cuaderno nuevo cerrado sobre la mesa]'
+  },
+  silla: {
+    title: 'La silla vacía',
+    text: 'Majo consigue el video del bar por un contacto del dueño. La imagen es granulada, con la fecha quemada en la esquina. Cuenta las personas sentadas: cuatro. Cuenta las sillas: seis — dos corridas hacia atrás, servidas, sin nadie. Se queda mirando el video más tiempo del que debería, repitiendo el conteo en voz alta, como si decirlo distinto cambiara el número.',
+    instruction: 'Levanta la solapa de la página 3 de tu fanzine.',
+    img: '[IMG: CCTV — cuatro personas, dos sillas servidas y vacías]'
+  },
+  esquina: {
+    title: 'La esquina',
+    text: 'Majo vuelve donde Don Mario una vez más, cansada de medias respuestas. Él la mira distinto esta vez y le pregunta para qué busca a la otra, si ella tampoco está. Le cuenta que esa madrugada la vio caer bajo un motorizado ebrio en Ayacucho, y que después vio su sombra levantarse y seguir derecho hacia el pasaje, como si no hubiera pasado nada. Majo se queda parada en la esquina un buen rato, sin saber qué hacer con eso.',
+    instruction: 'Busca el dibujo escondido en tu fanzine.',
+    img: '[IMG: esquina de Ayacucho de noche, Don Mario de espaldas]'
+  },
+  muestra: {
+    title: 'La muestra',
+    text: 'Majo cuelga el sketchbook abierto en el retrato de la pelada del bar. La gente se detiene frente a esa cara sin saber bien por qué les incomoda tanto. Antes, don Hernán le había mostrado una foto vieja: una compañera de universidad que él había olvidado por completo hasta ese día. Majo no le encontró la relación. La muestra queda montada toda la semana. Alguien sigue mirando esa cara — y eso, por ahora, basta para que siga ahí.',
+    instruction: 'Busca el sobre de la página 5 de tu fanzine.',
+    img: '[IMG: sala de muestra, sketchbook abierto en el retrato de Juana]'
+  }
+};
+
+/* ---------------------------------------------------------------------
+   NAVEGACIÓN ENTRE PANTALLAS
+   --------------------------------------------------------------------- */
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.toggle('active', s.dataset.screen === name);
+  });
+  document.getElementById('topbar').hidden = (name === 'portada');
+  if(name === 'mesa'){ renderMesa(); }
+  updateTopStats();
+  window.scrollTo(0,0);
+}
+
+function startGame(){
+  playthroughCount++;
+  state = freshState();
+  showScreen('morning');
+}
+
+function restartGame(){
+  // Reinicia SOLO el recorrido de esta partida. Los finales descubiertos
+  // (endingsSeen) y el contador de vueltas se conservan a propósito:
+  // el sentido de "volver a empezar" es poder buscar los finales que faltan.
+  state = freshState();
+  closeModal();
+  showScreen('portada');
+}
+
+function updateTopStats(){
+  const explored = HOTSPOT_KEYS.filter(k => state.visited[k]).length;
+  document.getElementById('stat-explorados').textContent = `Explorados: ${explored}/${HOTSPOT_KEYS.length}`;
+  document.getElementById('stat-finales').textContent = `Finales descubiertos: ${endingsSeen.size}/4`;
+}
+
+/* ---------------------------------------------------------------------
+   MODAL genérico
+   --------------------------------------------------------------------- */
+function openModal(html){
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+function placeholderBox(label){
+  return `<div class="placeholder small">[IMG: ${label}]</div>`;
+}
+
+// Botón de "audio": al hacer clic revela el texto del testimonio,
+// simulando la reproducción (por ahora no hay archivos de audio reales).
+function audioButton(label, fullText){
+  return `<div class="audio-wrap">
+    <button type="button" class="audio-btn" onclick="
+      this.nextElementSibling.hidden = false;
+      this.disabled = true;
+      this.textContent = '▶ audio reproducido';
+    ">▶ audio: ${label}</button>
+    <p class="audio-text" hidden>${fullText}</p>
+  </div>`;
+}
+
+/* ---------------------------------------------------------------------
+   NODO 1 — La mañana perdida: tres pop-ups
+   --------------------------------------------------------------------- */
+function openMorningClue(key){
+  const late = playthroughCount >= 3 ? ' <em>El hueco de horas ya no te parece cualquier cosa.</em>' : '';
+  const clues = {
+    escritorio: {
+      label:'hueco en el escritorio, rectángulo sin polvo donde iba el cuaderno',
+      text:'El cuaderno de dibujo siempre vive ahí. Hoy no está: se nota un rectángulo limpio en medio del polvo del escritorio.'
+    },
+    maleta: {
+      label:'interior de la maleta, vacía',
+      text:'Revisás la maleta con la que saliste anoche. Nada. Ni rastro del cuaderno.'
+    },
+    transporte: {
+      label:'app de transporte — hora del carro pedido vs. hora de llegada',
+      text:'La app muestra la hora en la que pediste el carro. Después, un salto raro hasta la hora en la que se supone que llegaste a tu casa. En el medio, un hueco que la app no explica.' + late
+    }
+  };
+  const c = clues[key];
+  openModal(`<h3>${c.label.split(',')[0]}</h3>${placeholderBox(c.label)}<p>${c.text}</p>`);
+}
+
+/* ---------------------------------------------------------------------
+   NODO 4 — La mesa: manejo de hotspots
+   --------------------------------------------------------------------- */
+document.querySelectorAll('.hotspot').forEach(btn=>{
+  btn.addEventListener('click', ()=> handleHotspot(btn.dataset.key));
+});
+
+function handleHotspot(key){
+  switch(key){
+    case 'juana':      openJuana(); break;
+    case 'donmario':   openDonMario(); break;
+    case 'sketchbook': openSketchbook(); break;
+    case 'cctv':       openCCTV(); break;
+    default:           openTestimonio(key); break;
+  }
+  state.visited[key] = true;
+  renderMesa();
+}
+
+function openTestimonio(key){
+  const t = TESTIMONIOS[key];
+  openModal(`
+    <h3>${t.nombre}</h3>
+    ${placeholderBox('retrato ' + t.nombre)}
+    <span class="nitidez-tag">nitidez del retrato: ${t.nitidez}</span>
+    ${audioButton('testimonio de ' + t.nombre, t.texto)}
+  `);
+}
+
+// Juana es presencia muda: NUNCA da testimonio (regla dura del diseño).
+function openJuana(){
+  openModal(`
+    <h3>Juana</h3>
+    ${placeholderBox('retrato Juana')}
+    <p class="silencio">…</p>
+    <p style="color:var(--muted); font-style:italic;">Silencio. No te dice nada.</p>
+  `);
+}
+
+// Don Mario: mecánica de dos estados. Primera vez = incoherencia sin
+// pista. Al volver (2ª vez o más) = la pista real que abre su rama.
+function openDonMario(){
+  state.donMarioVisits++;
+  if(state.donMarioVisits === 1){
+    openModal(`
+      <h3>Don Mario</h3>
+      ${placeholderBox('Don Mario en su esquina, cigarro en la mano')}
+      ${audioButton('Don Mario', DONMARIO_AUDIO_1)}
+      <p style="color:var(--muted); font-size:0.85rem;">Suena a puro trago. No parece llevar a nada.</p>
+    `);
+  } else {
+    openModal(`
+      <h3>Don Mario (otra vez)</h3>
+      ${placeholderBox('Don Mario en su esquina, mirándote distinto')}
+      ${audioButton('Don Mario', DONMARIO_AUDIO_2)}
+      <p style="color:var(--muted); font-size:0.85rem;">Esta vez no parece tan borracho como pensabas.</p>
+    `);
+  }
+}
+
+function openSketchbook(){
+  openModal(`
+    <h3>Sketchbook</h3>
+    ${placeholderBox('sketchbook — retrato a lápiz de la pelada de esa noche')}
+    <p>Un dibujo a lápiz de una cara. La reconocés, pero algo en los ojos no cuadra del todo.</p>
+    <p class="cian-note">Un solo trazo de tinta cian, fuera de lugar en medio de todo el lápiz gris.</p>
+  `);
+}
+
+function openCCTV(){
+  openModal(`
+    <h3>Cámara CCTV</h3>
+    ${placeholderBox('CCTV — plano de la mesa, blanco y negro, fecha en la esquina')}
+    <p>Video en blanco y negro, fecha quemada en la esquina. Se cuentan cuatro personas sentadas a la mesa.</p>
+    <p>Hay dos puestos más: sillas corridas hacia atrás, servidas, vacías.</p>
+  `);
+}
+
+/* ---------------------------------------------------------------------
+   Render del hub: hotspots visitados, notas y contadores de finales
+   --------------------------------------------------------------------- */
+function renderMesa(){
+  document.querySelectorAll('.hotspot').forEach(btn=>{
+    btn.classList.toggle('visited', !!state.visited[btn.dataset.key]);
+  });
+
+  // Texto de introducción, distinto según cuántas vueltas lleva jugando
+  // (los "tres estados del juego"): nunca revela nada prohibido, solo
+  // cambia el tono de lo que Majo/el jugador ya intuye.
+  const introEl = document.getElementById('hub-intro-text');
+  if(playthroughCount >= 3){
+    introEl.textContent = 'Ya sabés qué buscar. Esta vez mirás todo distinto.';
+  } else if(playthroughCount >= 2){
+    introEl.textContent = 'Algo no te cuadra. Esta vez prestás más atención.';
+  } else {
+    introEl.textContent = 'Buscá el cuaderno. Hablá con la gente de la mesa.';
+  }
+
+  // Notas de Majo: se van llenando solas a medida que se escuchan
+  // testimonios (tablero de investigación, opción B del §5 del diseño).
+  const notasKeys = ['val','milo','alejo','sofi','majo'];
+  const notas = notasKeys.filter(k => state.visited[k]).map(k => TESTIMONIOS[k].nota);
+  if(state.donMarioVisits >= 2){
+    notas.push('Don Mario dijo algo raro de "la pelada" cuando volviste a preguntarle.');
+  }
+  const notasEl = document.getElementById('notas-content');
+  notasEl.innerHTML = notas.length
+    ? '<ul>' + notas.map(n => `<li>${n}</li>`).join('') + '</ul>'
+    : '<span class="empty">(en blanco todavía — escuchá a alguien)</span>';
+
+  // Leyenda de finales ya descubiertos (acumulada entre partidas)
+  const legend = document.getElementById('finals-legend');
+  legend.innerHTML = Object.entries(ENDINGS).map(([key, e])=>{
+    const seen = endingsSeen.has(key);
+    return `<span class="${seen ? 'seen' : ''}">${seen ? '✓' : '·'} ${e.title}</span>`;
+  }).join('');
+
+  updateTopStats();
+}
+
+/* ---------------------------------------------------------------------
+   DECISIÓN Y FINALES
+   --------------------------------------------------------------------- */
+function goToEnding(key){
+  const alreadySeen = endingsSeen.has(key);
+  endingsSeen.add(key);
+  state.currentEnding = key;
+
+  const e = ENDINGS[key];
+  document.getElementById('final-title').textContent = e.title;
+  document.getElementById('final-image').textContent = e.img;
+  document.getElementById('final-text').textContent = e.text;
+  document.getElementById('final-instruction').textContent = e.instruction;
+  document.getElementById('final-repeat').classList.toggle('hidden', !alreadySeen);
+
+  closeModal();
+  showScreen('final');
+}
+</script>
+</body>
+</html>
