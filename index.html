@@ -7,8 +7,15 @@
 <style>
 /* =====================================================================
    LA SEXTA SILLA — prototipo funcional-minimalista, un solo archivo.
-   Paleta tomada de la biblia del ecosistema (fondo oscuro + acento magenta).
-   Nada de imágenes reales: todo lo visual es un placeholder con etiqueta.
+
+   REGLA DE FLUJO: el juego NUNCA vuelve hacia atrás. No hay botones
+   "Volver" en ningún lado. Cada decisión de la fase de búsqueda es
+   definitiva y lleva a un único desenlace. El único punto de reinicio
+   es "Volver a empezar", y solo existe en las pantallas de final.
+
+   Paleta tomada de la biblia del ecosistema: fondo oscuro + acento
+   magenta + cian EXCLUSIVO para Juana. Nada de imágenes reales: todo lo
+   visual es un placeholder con etiqueta descriptiva.
    ===================================================================== */
 :root{
   --bg:#141414;
@@ -27,7 +34,7 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:Georgia, 'Times New Roman', serif;
-  line-height:1.5;
+  line-height:1.55;
   min-height:100vh;
 }
 h1,h2,h3{ font-family:Georgia, serif; letter-spacing:0.02em; }
@@ -44,19 +51,29 @@ button{ font-family:inherit; cursor:pointer; }
   padding-bottom:10px; margin-bottom:22px;
 }
 .topbar .brand{ font-size:0.95rem; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase; }
-.topbar .stats{ font-size:0.8rem; color:var(--muted); display:flex; gap:14px; align-items:center; }
-.btn-restart{
-  background:transparent; color:var(--accent-light); border:1px solid var(--accent);
-  padding:5px 10px; border-radius:3px; font-size:0.75rem;
-}
-.btn-restart:hover{ background:var(--accent); color:#fff; }
+.topbar .stats{ font-size:0.8rem; color:var(--muted); }
+.topbar .stats span.done{ color:var(--ok); }
 
 .screen{ display:none; animation:fadein .25s ease; }
 .screen.active{ display:block; }
 @keyframes fadein{ from{opacity:0;} to{opacity:1;} }
 
-/* ---------- botones de navegación ---------- */
-.nav-row{ display:flex; justify-content:space-between; margin-top:28px; gap:10px; }
+/* ---------- encabezado de día (fase de búsqueda y nodos con tiempo) ---------- */
+.day-header{
+  display:inline-block;
+  border:1px solid var(--accent);
+  color:var(--accent-light);
+  font-family:monospace;
+  font-size:0.78rem;
+  letter-spacing:0.12em;
+  padding:4px 10px;
+  border-radius:3px;
+  margin-bottom:14px;
+  text-transform:uppercase;
+}
+
+/* ---------- botones de navegación (solo hacia adelante) ---------- */
+.nav-row{ display:flex; justify-content:flex-end; margin-top:28px; }
 .btn{
   background:var(--accent); color:#fff; border:none; padding:10px 18px;
   border-radius:3px; font-size:0.95rem;
@@ -79,6 +96,26 @@ button{ font-family:inherit; cursor:pointer; }
   margin-bottom:10px;
 }
 .placeholder.small{ padding:14px 8px; font-size:0.75rem; }
+
+/* ---------- placeholder "glitcheado" de la CCTV en exploración ---------- */
+.placeholder.glitch{
+  border-color:var(--accent);
+  color:var(--cian);
+  font-weight:bold;
+  letter-spacing:0.2em;
+  animation:glitch-flicker 1.4s infinite steps(2);
+  text-shadow:2px 0 var(--accent), -2px 0 var(--cian);
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 3px),
+    repeating-linear-gradient(45deg,#1a1a1a,#1a1a1a 10px,#0e0e0e 10px,#0e0e0e 20px);
+}
+@keyframes glitch-flicker{
+  0%{ opacity:1; transform:translate(0,0); }
+  20%{ opacity:0.7; transform:translate(1px,0); }
+  40%{ opacity:1; transform:translate(-1px,0); }
+  60%{ opacity:0.85; transform:translate(0,1px); }
+  100%{ opacity:1; transform:translate(0,0); }
+}
 
 /* ---------- audio simulado ---------- */
 .audio-wrap{ margin:10px 0; }
@@ -108,7 +145,25 @@ button{ font-family:inherit; cursor:pointer; }
 .bubble.other{ background:#26302c; align-self:flex-start; color:#e8dbc0; }
 .bubble .who{ display:block; font-size:0.7rem; color:var(--accent-light); margin-bottom:2px; }
 
-/* ---------- la mesa (hub) ---------- */
+/* ---------- decisión estilo "mensaje de whatsapp que Majo va a enviar" ---------- */
+.wa-decision{ display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+.wa-option{
+  background:#152018; border:1px solid #2d4a3a; border-radius:12px 12px 12px 2px;
+  padding:12px 14px; color:#eafff2; font-size:0.92rem; text-align:left;
+  max-width:80%;
+}
+.wa-option:hover{ border-color:var(--accent-light); background:#1c2a20; }
+.wa-option .tap-hint{ display:block; margin-top:6px; font-size:0.7rem; color:var(--muted); font-style:italic; }
+
+/* ---------- decisión de la fase de búsqueda (3 caminos) ---------- */
+.branch-grid{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:16px; }
+.branch-grid button{
+  background:var(--bg-panel); color:var(--text); border:1px solid var(--muted);
+  padding:14px 14px; border-radius:4px; font-size:0.95rem; text-align:left;
+}
+.branch-grid button:hover{ border-color:var(--accent-light); color:var(--accent-light); }
+
+/* ---------- la mesa (hub de exploración) ---------- */
 .mesa-scene{ position:relative; width:100%; aspect-ratio:16/9; margin-bottom:20px; }
 .mesa-scene .placeholder{ position:absolute; inset:0; margin:0; display:flex; align-items:center; justify-content:center; padding:10px; }
 .hotspot{
@@ -122,8 +177,6 @@ button{ font-family:inherit; cursor:pointer; }
 .hotspot.visited::after{ content:" ✓"; }
 .hotspot.object{ border-style:dashed; }
 
-.hub-intro{ color:var(--muted); font-size:0.9rem; margin-bottom:14px; font-style:italic; }
-
 .notas-panel{
   background:var(--bg-panel); border:1px solid var(--border); border-radius:6px;
   padding:14px 16px; margin:18px 0;
@@ -131,23 +184,6 @@ button{ font-family:inherit; cursor:pointer; }
 .notas-panel h3{ margin:0 0 8px; font-size:1rem; color:var(--accent-light); }
 .notas-panel ul{ margin:0; padding-left:18px; font-size:0.88rem; color:var(--text); }
 .notas-panel .empty{ color:var(--muted); font-style:italic; font-size:0.88rem; }
-
-.decision-box{
-  border:1px solid var(--accent); border-radius:6px; padding:16px; margin-top:24px;
-  background:linear-gradient(180deg, rgba(139,30,63,0.08), transparent);
-}
-.decision-box h3{ margin:0 0 4px; color:var(--accent-light); }
-.decision-box .hint{ color:var(--muted); font-size:0.82rem; margin-bottom:14px; }
-.decision-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-@media (max-width:520px){ .decision-grid{ grid-template-columns:1fr; } }
-.decision-grid button{
-  background:var(--bg-panel); color:var(--text); border:1px solid var(--muted);
-  padding:12px 10px; border-radius:4px; font-size:0.9rem; text-align:left;
-}
-.decision-grid button:hover{ border-color:var(--accent-light); color:var(--accent-light); }
-
-.finals-legend{ display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:14px; font-size:0.8rem; color:var(--muted); }
-.finals-legend span.seen{ color:var(--ok); }
 
 /* ---------- modal ---------- */
 .modal-overlay{
@@ -170,14 +206,20 @@ button{ font-family:inherit; cursor:pointer; }
 
 /* ---------- finales ---------- */
 .final-title{ color:var(--accent-light); font-size:1.6rem; margin-bottom:4px; }
-.final-verdad-oculta{ display:none; } /* nunca se muestra: recordatorio de que no se revela fuera del texto de crónica */
-.final-text{ font-size:1rem; margin:16px 0; }
+.final-text{ font-size:1rem; margin:16px 0; white-space:pre-line; }
 .final-instruction{
   border:1px dashed var(--accent); padding:12px 14px; border-radius:6px;
   color:var(--accent-light); font-family:monospace; margin:18px 0;
 }
 .final-repeat{ color:var(--muted); font-style:italic; font-size:0.85rem; }
 .final-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; }
+
+.closing-box{
+  margin-top:26px; padding:18px; border:1px solid var(--cian); border-radius:8px;
+  background:rgba(95,214,224,0.06);
+}
+.closing-box h3{ margin:0 0 8px; color:var(--cian); }
+.closing-box p{ margin:0; font-style:italic; }
 
 /* ---------- howto ---------- */
 .rules-list{ padding-left:20px; }
@@ -187,17 +229,14 @@ button{ font-family:inherit; cursor:pointer; }
 <body>
 <div id="app">
 
-  <!-- Barra superior: se oculta en la portada, visible en el resto -->
+  <!-- Barra superior: se oculta en la portada. Solo muestra el marcador
+       de finales descubiertos, que persiste entre reinicios. -->
   <div class="topbar" id="topbar" hidden>
     <div class="brand">La sexta silla · prototipo</div>
-    <div class="stats">
-      <span id="stat-explorados"></span>
-      <span id="stat-finales"></span>
-      <button class="btn-restart" onclick="restartGame()">Volver a empezar</button>
-    </div>
+    <div class="stats" id="stat-finales"></div>
   </div>
 
-  <!-- ============================= 0. PORTADA ============================= -->
+  <!-- ============================= 1. PORTADA ============================= -->
   <section class="screen active" data-screen="portada">
     <div class="portada">
       <div class="silla-icon">🪑</div>
@@ -208,8 +247,9 @@ button{ font-family:inherit; cursor:pointer; }
     </div>
   </section>
 
-  <!-- ===================== 1. LA MAÑANA PERDIDA ===================== -->
+  <!-- ===================== 2. LA MAÑANA PERDIDA (VIERNES, mediodía) ===================== -->
   <section class="screen" data-screen="morning">
+    <div class="day-header">VIERNES — mediodía</div>
     <h2>La mañana perdida</h2>
     <p>Majo se despierta. Faltan tres días para la muestra y no tiene ni idea de qué pasó anoche.
       Sabe que estuvo en Cervantes, con los de siempre. Todo se siente borroso — habrán mezclado
@@ -222,12 +262,11 @@ button{ font-family:inherit; cursor:pointer; }
       <button class="btn secondary" onclick="openMorningClue('transporte')">El teléfono</button>
     </div>
     <div class="nav-row">
-      <button class="btn secondary" onclick="showScreen('portada')">Volver</button>
       <button class="btn" onclick="showScreen('chat')">Siguiente</button>
     </div>
   </section>
 
-  <!-- ===================== 2. CHAT DE WHATSAPP ===================== -->
+  <!-- ===================== 3. EL CHAT (bizcochitos 💀) ===================== -->
   <section class="screen" data-screen="chat">
     <h2>El chat</h2>
     <div class="chat-window">
@@ -237,7 +276,7 @@ button{ font-family:inherit; cursor:pointer; }
         <div class="bubble other"><span class="who">Val</span>no lo dejaste donde la pelada?</div>
         <div class="bubble me"><span class="who">Majo</span>cuál pelada</div>
         <div class="bubble other"><span class="who">Milo</span>la que se sentó con nosotros ni te acuerdas jajaja</div>
-        <div class="bubble other"><span class="who">Alejo</span>se lo prestaste vos misma parce</div>
+        <div class="bubble other"><span class="who">Alejo</span>se lo prestaste vos misma parce, la que dibujaste</div>
         <div class="bubble me"><span class="who">Majo</span>no me acuerdo de nada mk</div>
         <div class="bubble other"><span class="who">Sofi</span>yo tampoco muy bien la verdad, estaba prendidísima</div>
         <div class="bubble me"><span class="who">Majo</span>cómo se llamaba</div>
@@ -246,30 +285,28 @@ button{ font-family:inherit; cursor:pointer; }
       </div>
     </div>
     <div class="nav-row">
-      <button class="btn secondary" onclick="showScreen('morning')">Volver</button>
       <button class="btn" onclick="showScreen('howto')">Siguiente</button>
     </div>
   </section>
 
-  <!-- ===================== 3. ¿CÓMO INVESTIGAR? ===================== -->
+  <!-- ===================== 4. ¿CÓMO INVESTIGAR? ===================== -->
   <section class="screen" data-screen="howto">
     <h2>¿Cómo investigar?</h2>
     <p>Vas a volver a la mesa de esa noche. No hay un orden correcto.</p>
     <ul class="rules-list">
       <li><strong>Explora.</strong> Toca a cada persona y cada objeto de la mesa. Nadie te va a repetir lo que ya sabés.</li>
       <li><strong>Compara.</strong> Nadie te va a resumir las versiones. Sos vos quien nota si algo no cuadra.</li>
-      <li><strong>Vuelve.</strong> No todo se entera a la primera. Hay gente a la que conviene preguntarle dos veces.</li>
-      <li><strong>Decide.</strong> Cuando quieras — no hace falta explorar todo — decidís qué hace Majo.</li>
-      <li><strong>Descubre.</strong> Cada decisión te lleva a un final distinto, y cada final te manda a una página del fanzine.</li>
+      <li><strong>Volvé.</strong> No todo se entera a la primera. Hay gente a la que conviene preguntarle dos veces.</li>
+      <li><strong>Decidí.</strong> Cuando sientas que ya viste suficiente, vas a tener que elegir por dónde sigue Majo — y esa elección no se puede deshacer.</li>
     </ul>
     <div class="nav-row">
-      <button class="btn secondary" onclick="showScreen('chat')">Volver</button>
       <button class="btn" onclick="showScreen('mesa')">Ir a la mesa</button>
     </div>
   </section>
 
-  <!-- ===================== 4. LA MESA (HUB) ===================== -->
+  <!-- ===================== 5. LA MESA (HUB de exploración, VIERNES noche — recuerdo) ===================== -->
   <section class="screen" data-screen="mesa">
+    <div class="day-header">VIERNES — recuerdo de esa noche</div>
     <h2>La mesa</h2>
     <p class="hub-intro" id="hub-intro-text"></p>
 
@@ -293,28 +330,85 @@ button{ font-family:inherit; cursor:pointer; }
       <div id="notas-content"><span class="empty">(en blanco todavía — escuchá a alguien)</span></div>
     </div>
 
-    <div class="decision-box">
-      <h3>¿Qué hace Majo?</h3>
-      <p class="hint">Podés decidir en cualquier momento. No hace falta haber hablado con todos.</p>
-      <div class="decision-grid">
-        <button onclick="goToEnding('cuaderno')">Rendirse, dejar de buscar</button>
-        <button onclick="goToEnding('silla')">Ver las cámaras del bar</button>
-        <button onclick="goToEnding('esquina')">Insistirle a Don Mario</button>
-        <button onclick="goToEnding('muestra')">Buscar con calma</button>
-      </div>
-      <div class="finals-legend" id="finals-legend"></div>
+    <div class="nav-row">
+      <button class="btn" onclick="leaveMesa()">Ya vi suficiente — seguir</button>
     </div>
   </section>
 
-  <!-- ===================== FINALES (pantalla dinámica) ===================== -->
+  <!-- ===================== 6. FASE DE BÚSQUEDA — PASO A (VIERNES, tarde) ===================== -->
+  <section class="screen" data-screen="searchA">
+    <div class="day-header">VIERNES — tarde</div>
+    <h2>Bellas Artes</h2>
+    <div class="placeholder">[IMG: entrada a Bellas Artes sede Ayacucho]</div>
+    <p>Majo vuelve a Cervantes y sube a Bellas Artes. Pregunta en portería por un cuaderno negro
+      con stickers y esquinas peladas. La señora revisa una caja de objetos perdidos: dos
+      paraguas, un buzo, un termo. Nada.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="showScreen('searchB')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== PASO B (VIERNES, noche) — DECISIÓN 1 (definitiva) ===================== -->
+  <section class="screen" data-screen="searchB">
+    <div class="day-header">VIERNES — noche</div>
+    <h2>Le escribe al grupo</h2>
+    <p>Majo abre el chat. Tiene que escribir algo, y lo que escriba decide qué hace el fin de
+      semana. Elegí el mensaje que manda — no hay forma de borrarlo después.</p>
+    <div class="wa-decision">
+      <button class="wa-option" onclick="chooseDecision1('buscar')">
+        parceros nadie ha traído el sketchbook… me va a tocar buscar en otro lado 🥲
+        <span class="tap-hint">→ seguir buscando</span>
+      </button>
+      <button class="wa-option" onclick="chooseDecision1('rendirse')">
+        nada, nadie lo trajo. mejor uso uno viejo de los míos, ya no tengo tiempo
+        <span class="tap-hint">→ dejar de buscar</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA BÚSQUEDA — PASO C (SÁBADO) ===================== -->
+  <section class="screen" data-screen="searchC">
+    <div class="day-header">SÁBADO</div>
+    <h2>El pasaje, local por local</h2>
+    <div class="placeholder">[IMG: pasaje de día, locales]</div>
+    <p>Majo pregunta local por local en el pasaje. No sabe en cuáles estuvieron, así que entra a
+      todos. En uno le dicen que vuelva mañana temprano. En otro le dicen que no. En Ruda le
+      dicen que le avisan si aparece.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="showScreen('searchD')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== PASO D (SÁBADO, tarde) — DECISIÓN 2 (definitiva) ===================== -->
+  <section class="screen" data-screen="searchD">
+    <div class="day-header">SÁBADO — tarde</div>
+    <h2>¿Por dónde sigue Majo?</h2>
+    <p>Esta elección también es definitiva.</p>
+    <div class="branch-grid">
+      <button onclick="goToEnding('silla')">Buscar bien: preguntar en los bares si tienen cámaras</button>
+      <button onclick="goToEnding('esquina')">Volver donde ese señor raro de la esquina</button>
+      <button onclick="goToEnding('muestra')">Seguir buscando con calma, sin afán</button>
+    </div>
+  </section>
+
+  <!-- ===================== 7. FINALES (pantalla dinámica) ===================== -->
   <section class="screen" data-screen="final">
+    <div class="day-header" id="final-day"></div>
     <h2 class="final-title" id="final-title"></h2>
     <div class="placeholder" id="final-image"></div>
     <p class="final-text" id="final-text"></p>
     <p class="final-repeat hidden" id="final-repeat">Ya habías llegado a este final antes.</p>
     <div class="final-instruction" id="final-instruction"></div>
+
+    <div class="closing-box hidden" id="closing-box">
+      <h3>Los cuatro finales</h3>
+      <p>Vas cuatro veces por la misma noche y las cuatro veces cambia lo que ves. Juana se
+        sienta en la mesa, desaparece de la cámara, se apaga si nadie la nombra, y a veces
+        también se lleva a Majo con ella. La sexta silla nunca estuvo vacía porque sí — estuvo
+        vacía porque ya nadie se acordaba de quién se sentaba ahí. Ahora vos sí.</p>
+    </div>
+
     <div class="final-actions">
-      <button class="btn secondary" onclick="showScreen('mesa')">Volver a la mesa</button>
       <button class="btn" onclick="restartGame()">Volver a empezar</button>
     </div>
   </section>
@@ -333,36 +427,28 @@ button{ font-family:inherit; cursor:pointer; }
 /* =====================================================================
    ESTADO DEL JUEGO
    Todo vive en memoria (variables JS). No se usa localStorage: al
-   recargar la página el prototipo vuelve a cero, tal como pide el brief.
-   Si en el futuro se agrega persistencia, debe ir envuelta en try/catch.
+   recargar la página el prototipo vuelve a cero por completo, incluidos
+   los finales descubiertos (si en el futuro se agrega persistencia real,
+   debe ir envuelta en try/catch).
    ===================================================================== */
 
-// Contador de partidas jugadas en esta misma sesión (no se resetea con
-// "Volver a empezar"): sirve para que algunos textos se sientan distintos
-// en la 2ª/3ª vuelta, sin revelar nunca los secretos prohibidos.
-let playthroughCount = 0;
+// Persisten ENTRE partidas ("Volver a empezar" no los toca):
+let playthroughCount = 0;   // cuántas veces se le dio "Empezar"
+let endingsSeen = new Set(); // qué finales ya se descubrieron
 
-// endingsSeen y esto también persisten entre reinicios: representan el
-// progreso acumulado del jugador ("finales descubiertos: X/4").
-let endingsSeen = new Set();
-
-// Estado de una partida (esto SÍ se reinicia con "Volver a empezar").
+// Estado de la partida en curso: sí se reinicia con "Volver a empezar".
 let state = null;
-
 function freshState(){
   return {
     visited: { alejo:false, sofi:false, milo:false, val:false, majo:false, juana:false,
                sketchbook:false, cctv:false, donmario:false },
-    donMarioVisits: 0,
-    currentEnding: null
+    donMarioVisits: 0
   };
 }
 state = freshState();
 
-const HOTSPOT_KEYS = Object.keys(freshState().visited);
-
 /* ---------------------------------------------------------------------
-   CONTENIDO — testimonios (texto EXACTO tomado de la biblia, §8)
+   CONTENIDO — testimonios (texto exacto)
    --------------------------------------------------------------------- */
 const TESTIMONIOS = {
   val:   { nombre:'Val',   nitidez:'nítida',           texto:'"Se nos sentó una pelada en la acera, Juana se llamaba. Ya como a las tres cada uno pidió su carro y se fue."',
@@ -383,32 +469,36 @@ const DONMARIO_AUDIO_2 = '"…la pelada que buscás… esa ya no baja caminando,
 const ENDINGS = {
   cuaderno: {
     title: 'El cuaderno cerrado',
-    text: 'Majo deja de buscar. El viernes se va a parchar con quien la invite, sin pensar más en el cuaderno perdido. El lunes compra uno nuevo y empieza a dibujar otra cosa. Nadie vuelve a mencionar a la pelada de la obra; con el tiempo, ni siquiera Val está del todo segura de haberla visto. Algunas caras se apagan solas, sin que nadie note el momento exacto.',
-    instruction: 'Hay una pista escondida en tu fanzine. Búscala.',
-    img: '[IMG: cuaderno nuevo cerrado sobre la mesa]'
+    day: 'VIERNES — cierre',
+    img: '[IMG: día de la muestra, un taburete alto exponiendo un sketchbook CLARAMENTE DIFERENTE al del inicio del juego]',
+    text: 'Majo deja de buscar. El fin de semana se va a parchar sin pensar más en el cuaderno. El lunes lleva uno viejo a la muestra y funciona igual. La noche perdida la cuenta cuando sale el tema —que se le fue la película, que estaba muy tomada—, y nadie pregunta más. La pelada de esa noche se queda por fuera de la muestra y de la conversación. Nadie la nombra, nadie la dibuja, nadie la mira.',
+    instruction: 'Hay una pista escondida en tu fanzine. Búscala.'
   },
   silla: {
     title: 'La silla vacía',
-    text: 'Majo consigue el video del bar por un contacto del dueño. La imagen es granulada, con la fecha quemada en la esquina. Cuenta las personas sentadas: cuatro. Cuenta las sillas: seis — dos corridas hacia atrás, servidas, sin nadie. Se queda mirando el video más tiempo del que debería, repitiendo el conteo en voz alta, como si decirlo distinto cambiara el número.',
-    instruction: 'Levanta la solapa de la página 3 de tu fanzine.',
-    img: '[IMG: CCTV — cuatro personas, dos sillas servidas y vacías]'
+    day: 'SÁBADO — cierre',
+    img: '[IMG: CCTV — cuatro personas sentadas, DOS sillas corridas y servidas, vacías]',
+    text: 'En un bar le dicen que tienen cámara. Majo insiste hasta que el dueño la sienta frente al computador. La grabación es de esa madrugada. Cuenta las cabezas: deberían ser seis y solo hay cuatro. Hay dos sillas corridas, y frente a cada una un puesto servido —los vasos a medio tomar, los ceniceros usados—, como si alguien hubiera estado ahí toda la noche. Pero ambas sillas están vacías. Majo se queda mirando esas dos sillas hasta que el dueño le pregunta si quiere que le adelante.',
+    instruction: 'Levanta la solapa de la página 3 de tu fanzine.'
   },
   esquina: {
     title: 'La esquina',
-    text: 'Majo vuelve donde Don Mario una vez más, cansada de medias respuestas. Él la mira distinto esta vez y le pregunta para qué busca a la otra, si ella tampoco está. Le cuenta que esa madrugada la vio caer bajo un motorizado ebrio en Ayacucho, y que después vio su sombra levantarse y seguir derecho hacia el pasaje, como si no hubiera pasado nada. Majo se queda parada en la esquina un buen rato, sin saber qué hacer con eso.',
-    instruction: 'Busca el dibujo escondido en tu fanzine.',
-    img: '[IMG: esquina de Ayacucho de noche, Don Mario de espaldas]'
+    day: 'SÁBADO — cierre',
+    img: '[IMG: esquina de Ayacucho de noche, Don Mario]',
+    text: 'Majo vuelve donde don Mario. Él le habla de las sombras que caminan el pasaje, de los que se sientan a una mesa y después no estuvieron nunca. Y entonces le dice, como si fuera lo más normal, que a ella también la vio: esa madrugada la vio bajando sola hacia Cervantes, que un motorizado ebrio se la llevó por delante en mitad de la calle y se voló, y que su sombra se levantó del piso y siguió bajando hacia el pasaje, a sentarse con los amigos, como si nada. Don Mario es el único que la ve como lo que realmente es.',
+    instruction: 'Busca el dibujo escondido en tu fanzine.'
   },
   muestra: {
     title: 'La muestra',
-    text: 'Majo cuelga el sketchbook abierto en el retrato de la pelada del bar. La gente se detiene frente a esa cara sin saber bien por qué les incomoda tanto. Antes, don Hernán le había mostrado una foto vieja: una compañera de universidad que él había olvidado por completo hasta ese día. Majo no le encontró la relación. La muestra queda montada toda la semana. Alguien sigue mirando esa cara — y eso, por ahora, basta para que siga ahí.',
-    instruction: 'Busca el sobre de la página 5 de tu fanzine.',
-    img: '[IMG: sala de muestra, sketchbook abierto en el retrato de Juana]'
+    day: 'DOMINGO → LUNES — cierre',
+    img: '[IMG: sala de muestra, sketchbook abierto en el retrato uncanny]',
+    text: 'El sábado Majo entra al bar de don Hernán a preguntar por el cuaderno. Antes de irse le muestra el retrato; a él le suena esa cara pero no la ubica, y le dice que vuelva. El domingo el cuaderno aparece por ahí, en una barra, como aparecen las cosas en el pasaje. Don Hernán le muestra una foto vieja y mal revelada: una compañera de universidad de hace treinta años que había olvidado por completo. El lunes Majo monta el sketchbook abierto en el retrato. La gente se detiene en esa cara sin saber por qué incomoda —parece de verdad pero no—. La muestra queda colgada toda la semana. La cara se queda ahí, mirando a todo el que pasa. Ya no necesita sentarse en ninguna mesa: le basta con que la sigan mirando.',
+    instruction: 'Busca el sobre de la página 5 de tu fanzine.'
   }
 };
 
 /* ---------------------------------------------------------------------
-   NAVEGACIÓN ENTRE PANTALLAS
+   NAVEGACIÓN — solo hacia adelante, nunca hay vuelta atrás
    --------------------------------------------------------------------- */
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(s=>{
@@ -427,18 +517,18 @@ function startGame(){
 }
 
 function restartGame(){
-  // Reinicia SOLO el recorrido de esta partida. Los finales descubiertos
-  // (endingsSeen) y el contador de vueltas se conservan a propósito:
-  // el sentido de "volver a empezar" es poder buscar los finales que faltan.
+  // Único punto de reinicio del juego, y solo existe en los finales.
+  // endingsSeen y playthroughCount se conservan a propósito: el sentido
+  // de reiniciar es ir por los finales que todavía faltan.
   state = freshState();
   closeModal();
   showScreen('portada');
 }
 
 function updateTopStats(){
-  const explored = HOTSPOT_KEYS.filter(k => state.visited[k]).length;
-  document.getElementById('stat-explorados').textContent = `Explorados: ${explored}/${HOTSPOT_KEYS.length}`;
-  document.getElementById('stat-finales').textContent = `Finales descubiertos: ${endingsSeen.size}/4`;
+  const n = endingsSeen.size;
+  document.getElementById('stat-finales').innerHTML =
+    `Finales descubiertos: <span class="${n===4?'done':''}">${n}/4</span>`;
 }
 
 /* ---------------------------------------------------------------------
@@ -451,7 +541,6 @@ function openModal(html){
 function closeModal(){
   document.getElementById('modal-overlay').classList.add('hidden');
 }
-
 function placeholderBox(label){
   return `<div class="placeholder small">[IMG: ${label}]</div>`;
 }
@@ -470,10 +559,14 @@ function audioButton(label, fullText){
 }
 
 /* ---------------------------------------------------------------------
-   NODO 1 — La mañana perdida: tres pop-ups
+   NODO 2 — La mañana perdida: tres pop-ups
    --------------------------------------------------------------------- */
 function openMorningClue(key){
-  const late = playthroughCount >= 3 ? ' <em>El hueco de horas ya no te parece cualquier cosa.</em>' : '';
+  // En la 3ª vuelta o más, la app de transporte suma una línea que
+  // inquieta sin explicar nada (regla de rejugabilidad, sin spoilers).
+  const late = playthroughCount >= 3
+    ? ' <em>Esta vez ese hueco de horas no te parece un detalle más.</em>'
+    : '';
   const clues = {
     escritorio: {
       label:'hueco en el escritorio, rectángulo sin polvo donde iba el cuaderno',
@@ -484,8 +577,8 @@ function openMorningClue(key){
       text:'Revisás la maleta con la que saliste anoche. Nada. Ni rastro del cuaderno.'
     },
     transporte: {
-      label:'app de transporte — hora del carro pedido vs. hora de llegada',
-      text:'La app muestra la hora en la que pediste el carro. Después, un salto raro hasta la hora en la que se supone que llegaste a tu casa. En el medio, un hueco que la app no explica.' + late
+      label:'app de transporte — carro pedido a las 3:14 a.m., hora de llegada en blanco',
+      text:'La app muestra la hora en la que pediste el carro: 3:14 a.m. Después, nada. La hora de llegada está en blanco, un hueco que la app no explica.' + late
     }
   };
   const c = clues[key];
@@ -493,7 +586,7 @@ function openMorningClue(key){
 }
 
 /* ---------------------------------------------------------------------
-   NODO 4 — La mesa: manejo de hotspots
+   NODO 5 — La mesa: manejo de hotspots (solo exploración, sin decisión)
    --------------------------------------------------------------------- */
 document.querySelectorAll('.hotspot').forEach(btn=>{
   btn.addEventListener('click', ()=> handleHotspot(btn.dataset.key));
@@ -561,17 +654,19 @@ function openSketchbook(){
   `);
 }
 
+// La CCTV en exploración NUNCA revela las sillas vacías: solo inquieta.
+// Esa revelación vive exclusivamente en el final "La silla vacía".
 function openCCTV(){
   openModal(`
     <h3>Cámara CCTV</h3>
-    ${placeholderBox('CCTV — plano de la mesa, blanco y negro, fecha en la esquina')}
-    <p>Video en blanco y negro, fecha quemada en la esquina. Se cuentan cuatro personas sentadas a la mesa.</p>
-    <p>Hay dos puestos más: sillas corridas hacia atrás, servidas, vacías.</p>
+    <div class="placeholder small glitch">SEÑAL PERDIDA</div>
+    <p>La grabación se corta antes de mostrar la mesa completa. Solo ruido, franjas de estática
+      y un contador de fecha que tampoco termina de leerse.</p>
   `);
 }
 
 /* ---------------------------------------------------------------------
-   Render del hub: hotspots visitados, notas y contadores de finales
+   Render del hub: hotspots visitados y notas de Majo
    --------------------------------------------------------------------- */
 function renderMesa(){
   document.querySelectorAll('.hotspot').forEach(btn=>{
@@ -579,7 +674,7 @@ function renderMesa(){
   });
 
   // Texto de introducción, distinto según cuántas vueltas lleva jugando
-  // (los "tres estados del juego"): nunca revela nada prohibido, solo
+  // ("los tres estados del juego"): nunca revela nada prohibido, solo
   // cambia el tono de lo que Majo/el jugador ya intuye.
   const introEl = document.getElementById('hub-intro-text');
   if(playthroughCount >= 3){
@@ -591,7 +686,7 @@ function renderMesa(){
   }
 
   // Notas de Majo: se van llenando solas a medida que se escuchan
-  // testimonios (tablero de investigación, opción B del §5 del diseño).
+  // testimonios (tablero de investigación que se arma jugando).
   const notasKeys = ['val','milo','alejo','sofi','majo'];
   const notas = notasKeys.filter(k => state.visited[k]).map(k => TESTIMONIOS[k].nota);
   if(state.donMarioVisits >= 2){
@@ -602,30 +697,46 @@ function renderMesa(){
     ? '<ul>' + notas.map(n => `<li>${n}</li>`).join('') + '</ul>'
     : '<span class="empty">(en blanco todavía — escuchá a alguien)</span>';
 
-  // Leyenda de finales ya descubiertos (acumulada entre partidas)
-  const legend = document.getElementById('finals-legend');
-  legend.innerHTML = Object.entries(ENDINGS).map(([key, e])=>{
-    const seen = endingsSeen.has(key);
-    return `<span class="${seen ? 'seen' : ''}">${seen ? '✓' : '·'} ${e.title}</span>`;
-  }).join('');
-
   updateTopStats();
 }
 
+// La mesa es solo exploración: acá no hay ninguna decisión. Este botón
+// es el único que saca al jugador del hub, hacia la fase de búsqueda.
+function leaveMesa(){
+  showScreen('searchA');
+}
+
 /* ---------------------------------------------------------------------
-   DECISIÓN Y FINALES
+   FASE DE BÚSQUEDA — decisiones definitivas, sin vuelta atrás
+   --------------------------------------------------------------------- */
+
+// DECISIÓN 1 (paso B, por WhatsApp). Es definitiva: una opción manda
+// directo a un final, la otra abre la rama de búsqueda del sábado.
+function chooseDecision1(choice){
+  if(choice === 'rendirse'){
+    goToEnding('cuaderno');
+  } else {
+    showScreen('searchC');
+  }
+}
+
+/* ---------------------------------------------------------------------
+   FINALES
    --------------------------------------------------------------------- */
 function goToEnding(key){
   const alreadySeen = endingsSeen.has(key);
   endingsSeen.add(key);
-  state.currentEnding = key;
 
   const e = ENDINGS[key];
+  document.getElementById('final-day').textContent = e.day;
   document.getElementById('final-title').textContent = e.title;
   document.getElementById('final-image').textContent = e.img;
   document.getElementById('final-text').textContent = e.text;
   document.getElementById('final-instruction').textContent = e.instruction;
   document.getElementById('final-repeat').classList.toggle('hidden', !alreadySeen);
+
+  // Mensaje de cierre especial: solo aparece cuando ya se vieron los 4.
+  document.getElementById('closing-box').classList.toggle('hidden', endingsSeen.size < 4);
 
   closeModal();
   showScreen('final');
