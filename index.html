@@ -163,6 +163,17 @@ button{ font-family:inherit; cursor:pointer; }
 }
 .branch-grid button:hover{ border-color:var(--accent-light); color:var(--accent-light); }
 
+/* ---------- hubs de exploración de los días de búsqueda (sábado día/noche) ---------- */
+.spot-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+@media (max-width:520px){ .spot-grid{ grid-template-columns:1fr; } }
+.spot-btn{
+  background:var(--bg-panel); color:var(--text); border:1.5px solid var(--accent-light);
+  padding:12px 14px; border-radius:6px; font-size:0.9rem; text-align:left;
+}
+.spot-btn:hover{ background:var(--accent); }
+.spot-btn.visited{ border-color:var(--ok); background:rgba(107,107,90,0.35); }
+.spot-btn.visited::after{ content:" ✓"; }
+
 /* ---------- la mesa (hub de exploración) ---------- */
 .mesa-scene{ position:relative; width:100%; aspect-ratio:16/9; margin-bottom:20px; }
 .mesa-scene .placeholder{ position:absolute; inset:0; margin:0; display:flex; align-items:center; justify-content:center; padding:10px; }
@@ -417,10 +428,11 @@ button{ font-family:inherit; cursor:pointer; }
       entrada ve la puerta de Bellas Artes a un lado y los bares al otro, todavía cerrados o medio
       abriendo.</p>
     <p class="majo-thought">Si alguien me viera ahora, ¿qué le diría que estoy haciendo?</p>
-    <p>¿Por dónde empieza a preguntar?</p>
+    <p>¿Por dónde empieza a preguntar? Todavía le quedan tres días completos antes de la muestra —
+      o eso se repite, para no sentir que ya está atrasada.</p>
     <div class="branch-grid">
       <button onclick="showScreen('searchA')">Subir a Bellas Artes</button>
-      <button onclick="showScreen('searchC')">Preguntar en los bares del pasaje</button>
+      <button onclick="showScreen('searchBaresViernes')">Preguntar en los bares del pasaje</button>
     </div>
   </section>
 
@@ -436,6 +448,22 @@ button{ font-family:inherit; cursor:pointer; }
       reclamado en meses, un termo. Nada que se le parezca.</p>
     <p>"Si aparece yo se lo guardo", le dice, y Majo le agradece más de lo que la respuesta merece,
       solo por no haberse quedado sola con la pregunta.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="showScreen('searchB')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== PASO A' (VIERNES, tarde) — los bares, primera vuelta ===================== -->
+  <section class="screen" data-screen="searchBaresViernes">
+    <div class="day-header">VIERNES — tarde</div>
+    <h2>Una vuelta rápida por los bares</h2>
+    <div class="placeholder">[IMG: pasaje de día, meseros montando mesas, todavía sin gente]</div>
+    <p>A esta hora los bares apenas están abriendo: meseros sacando sillas, alguien trapeando la
+      entrada. Majo pregunta en dos o tres, más por no quedarse quieta que porque espere algo. Nadie
+      la reconoce, nadie recuerda una mesa de seis, y en uno le dicen —sin mala intención, pero sin
+      mucho tacto tampoco— que de noche todo el mundo se ve igual de tomado, así que quién se va a
+      acordar de una cara en particular.</p>
+    <p class="majo-thought">Yo tampoco me acordaría de mí, con esa lógica.</p>
     <div class="nav-row">
       <button class="btn" onclick="showScreen('searchB')">Siguiente</button>
     </div>
@@ -462,59 +490,46 @@ button{ font-family:inherit; cursor:pointer; }
     </div>
   </section>
 
-  <!-- ===================== RAMA BÚSQUEDA — PASO C (SÁBADO) ===================== -->
-  <section class="screen" data-screen="searchC">
-    <div class="day-header">SÁBADO</div>
-    <h2>El pasaje, local por local</h2>
-    <div class="placeholder">[IMG: pasaje de día, locales]</div>
-    <p>No sabe con certeza en cuáles locales estuvieron esa noche, así que entra a todos, uno por
-      uno, repitiendo la misma descripción hasta que empieza a sonarle ensayada hasta a ella. En uno
-      le dicen que vuelva mañana temprano, que el que sabe llega tarde. En otro, un man ni la deja
-      terminar la frase: "no, parce, acá no". En Ruda, la del mostrador la escucha completa, le
-      apunta el número en un papel, y le dice que le avisa si aparece — con una amabilidad que a
-      Majo, no sabe por qué, se le siente casi peor que un no.</p>
+  <!-- ===================== SÁBADO DE DÍA — HUB de exploración (como la mesa, pero para este día) ===================== -->
+  <section class="screen" data-screen="searchSabadoHub">
+    <div class="day-header">SÁBADO — de día</div>
+    <h2>El segundo día</h2>
+    <p>Un día entero por delante y ningún plan mejor que repetir lo de ayer, con más calma. Andá
+      por donde quieras — nadie te apura, pero tampoco nadie te va a resolver nada solo por
+      preguntar bonito.</p>
+    <div class="placeholder">[IMG: pasaje de Cervantes de día, locales abiertos, gente circulando]</div>
+    <div class="spot-grid">
+      <button class="spot-btn" data-spot="bellasartes2" onclick="handleSabadoSpot('bellasartes2')">Bellas Artes, otra vez</button>
+      <button class="spot-btn" data-spot="ruda" onclick="handleSabadoSpot('ruda')">Ruda</button>
+      <button class="spot-btn" data-spot="hernan" onclick="handleSabadoSpot('hernan')">El bar de don Hernán</button>
+      <button class="spot-btn" data-spot="casa" onclick="handleSabadoSpot('casa')">Tu casa</button>
+      <button class="spot-btn" data-spot="chatsabado" onclick="handleSabadoSpot('chatsabado')">El chat</button>
+    </div>
     <div class="nav-row">
-      <button class="btn" onclick="showScreen('searchD')">Siguiente</button>
+      <button class="btn" onclick="showScreen('searchSabadoNocheHub')">Se hace de noche — seguir</button>
     </div>
   </section>
 
-  <!-- ===================== PASO D (SÁBADO, tarde) — DECISIÓN 2 (definitiva) ===================== -->
-  <section class="screen" data-screen="searchD">
-    <div class="day-header">SÁBADO — tarde</div>
-    <h2>¿Por dónde sigue Majo?</h2>
-    <p>Ya lleva un día entero dándole vueltas al mismo hueco y no tiene nada que no supiera desde el
-      viernes. La pregunta ya no es solo dónde está el cuaderno — es por qué le importa tanto encontrar
-      a una persona de la que, hasta hace dos días, ni sabía el nombre.</p>
-    <p>Esta elección también es definitiva. Ninguno de los tres caminos se resuelve hoy mismo.</p>
-    <div class="branch-grid">
-      <button onclick="showScreen('searchBarHernan1')">Buscar bien: preguntar en los bares si tienen cámaras</button>
-      <button onclick="showScreen('searchMarioInsiste1')">Volver donde ese señor raro de la esquina</button>
-      <button onclick="showScreen('searchCalmaHernan1')">Seguir buscando con calma, sin afán</button>
-    </div>
-  </section>
-
-  <!-- ===================== RAMA CÁMARAS — 1) el bar de don Hernán (SÁBADO tarde) ===================== -->
-  <section class="screen" data-screen="searchBarHernan1">
-    <div class="day-header">SÁBADO — tarde</div>
-    <h2>El bar de don Hernán</h2>
-    <div class="placeholder">[IMG: barra de un bar de Cervantes, don Hernán detrás]</div>
-    <p>Uno de los meseros la manda donde el dueño, un señor canoso que seca vasos sin apuro mientras
-      la escucha. Majo le explica lo de la cámara con más detalle del necesario — la fecha, la hora
-      aproximada, cuántos eran — como si hablar mucho compensara lo poco que en realidad sabe. Don
-      Hernán asiente, le cree, pero: "eso lo maneja mi sobrino, y hoy libró. Venga mañana a esta hora,
-      yo le digo que se la muestre."</p>
-    <p>Antes de irse, casi por impulso, Majo saca el sketchbook y le enseña el dibujo de la pelada. Se
-      lo muestra pensando que va a decir que no, que nunca la ha visto — pero don Hernán se queda
-      mirando la hoja más tiempo del que debería, con una atención que no encaja con un "no la conozco".</p>
-    <p class="majo-thought">Si no la reconoce, ¿por qué no me lo dijo de una vez?</p>
-    <div class="nav-row">
-      <button class="btn" onclick="showScreen('searchCalle')">Siguiente</button>
-    </div>
-  </section>
-
-  <!-- ===================== RAMA CÁMARAS — 2) el camino a casa (SÁBADO noche) ===================== -->
-  <section class="screen" data-screen="searchCalle">
+  <!-- ===================== SÁBADO DE NOCHE — HUB (ambiente, sin decisiones) ===================== -->
+  <section class="screen" data-screen="searchSabadoNocheHub">
     <div class="day-header">SÁBADO — noche</div>
+    <h2>Los bares, de noche</h2>
+    <p>De noche el pasaje cambia de cara: más neón, más ruido, más gente que no conoce de nada.
+      Majo se mueve entre un par de bares sin afán, más por cansancio de estar sola en su casa que
+      por esperar encontrar algo.</p>
+    <div class="placeholder">[IMG: los bares de Cervantes de noche, neón, gente afuera]</div>
+    <div class="spot-grid">
+      <button class="spot-btn" data-spot="otrobar" onclick="handleNocheSpot('otrobar')">Otro bar</button>
+      <button class="spot-btn" data-spot="lacalle" onclick="handleNocheSpot('lacalle')">La calle</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn" onclick="showScreen('searchCalle')">Volver a casa — seguir</button>
+    </div>
+  </section>
+
+  <!-- ===================== De camino a casa: Don Mario se le acerca (nunca elegido) ===================== -->
+  <section class="screen" data-screen="searchCalle">
+    <div class="day-header">SÁBADO — de madrugada</div>
     <h2>El camino a casa</h2>
     <div class="placeholder">[IMG: calle Ayacucho de noche, una figura parada a media cuadra]</div>
     <p>La calle está casi vacía, solo el ruido de fondo de un bar que todavía suena a dos cuadras.
@@ -531,7 +546,7 @@ button{ font-family:inherit; cursor:pointer; }
     </div>
   </section>
 
-  <!-- ===================== RAMA CÁMARAS — 3) otra laguna (transición forzada) ===================== -->
+  <!-- ===================== otra laguna (transición forzada, le pasa a todo el que sigue buscando) ===================== -->
   <section class="screen" data-screen="searchApagon">
     <div class="day-header">DOMINGO — otra vez sin recordar</div>
     <h2>Otra laguna</h2>
@@ -545,11 +560,28 @@ button{ font-family:inherit; cursor:pointer; }
       que se despertó con la boca seca, otra vez sin nada.</p>
     <p class="majo-thought">Esto ya no se siente como una mera laguna. Se siente como que me está pasando algo, no como que se me olvida algo.</p>
     <div class="nav-row">
-      <button class="btn" onclick="showScreen('searchBarHernan2')">Siguiente</button>
+      <button class="btn" onclick="showScreen('searchDomingoDecision')">Siguiente</button>
     </div>
   </section>
 
-  <!-- ===================== RAMA CÁMARAS — 4) de vuelta donde don Hernán, con clave (DOMINGO) ===================== -->
+  <!-- ===================== DOMINGO — DECISIÓN FINAL (definitiva, ya motivada por lo que pasó) ===================== -->
+  <section class="screen" data-screen="searchDomingoDecision">
+    <div class="day-header">DOMINGO</div>
+    <h2>¿Por dónde sigue Majo?</h2>
+    <p>Queda un día antes de la muestra y Majo no tiene ni el cuaderno ni una versión de esa noche
+      que le cierre del todo. Lo de Don Mario en la calle se le quedó rondando más de lo que
+      esperaba — <em>"y usté tampoco, pero eso lo entiende después"</em> — y todavía no sabe si eso
+      significa que debería tomárselo en serio, o dejarlo como lo que parece: puro trago hablando
+      solo.</p>
+    <p>Esta elección también es definitiva.</p>
+    <div class="branch-grid">
+      <button onclick="showScreen('searchBarHernan2')">Volver donde don Hernán por el video</button>
+      <button onclick="showScreen('searchMarioInsiste1')">Buscar a Don Mario para que le explique lo que dijo</button>
+      <button onclick="showScreen('searchCalmaHernan1')">Dejar de forzarlo, seguir con calma</button>
+    </div>
+  </section>
+
+  <!-- ===================== de vuelta donde don Hernán, con clave (DOMINGO) ===================== -->
   <section class="screen" data-screen="searchBarHernan2">
     <div class="day-header">DOMINGO</div>
     <h2>De vuelta donde don Hernán</h2>
@@ -578,25 +610,27 @@ button{ font-family:inherit; cursor:pointer; }
     </div>
   </section>
 
-  <!-- ===================== RAMA DON MARIO — 1) la esquina, otra vez (SÁBADO tarde) ===================== -->
+  <!-- ===================== RAMA DON MARIO — 1) esta vez ella lo busca (DOMINGO tarde) ===================== -->
   <section class="screen" data-screen="searchMarioInsiste1">
-    <div class="day-header">SÁBADO — tarde</div>
-    <h2>La esquina, otra vez</h2>
+    <div class="day-header">DOMINGO — tarde</div>
+    <h2>Esta vez lo busca ella</h2>
     <div class="placeholder">[IMG: Don Mario en su esquina, de día, evasivo]</div>
-    <p>Don Mario está en su puesto de siempre, con el mismo cigarro a medio fumar de siempre, pero hoy
-      más esquivo que la primera vez. En cuanto ella menciona a la pelada de esa noche, algo le cambia
-      en la cara — apenas un segundo — antes de que vuelva a reírse de algo que no viene al caso y le
+    <p>Es la primera vez en todo esto que Majo busca a Don Mario a propósito, en vez de que él se le
+      cruce. Quiere que le explique lo de la calle, lo de "usté tampoco" — necesita que se lo diga
+      claro, sin el eco raro de la madrugada. Lo encuentra en su esquina de siempre, con el mismo
+      cigarro a medio fumar, pero hoy más esquivo. En cuanto ella menciona esa noche, algo le cambia
+      en la cara —apenas un segundo— antes de que vuelva a reírse de algo que no viene al caso y le
       ofrezca un trago que ella no acepta.</p>
-    <p class="majo-thought">La primera vez pensé que estaba muy borracho para entender la pregunta. Ahora me pregunto si entendió perfecto y por eso no quiere contestar.</p>
+    <p class="majo-thought">Esta vez fui yo la que lo busqué. Y aun así se las arregla para hacerme sentir que soy yo la que le está huyendo a algo.</p>
     <div class="branch-grid">
       <button onclick="goToEnding('esquina','directo')">Presionarlo ahí mismo</button>
       <button onclick="showScreen('searchMarioNoche')">Volver de noche, cuando esté más solo</button>
     </div>
   </section>
 
-  <!-- ===================== RAMA DON MARIO — 2) lo espera de noche (SÁBADO madrugada) ===================== -->
+  <!-- ===================== RAMA DON MARIO — 2) lo espera de noche (DOMINGO noche) ===================== -->
   <section class="screen" data-screen="searchMarioNoche">
-    <div class="day-header">SÁBADO — de madrugada</div>
+    <div class="day-header">DOMINGO — noche</div>
     <h2>Lo espera de noche</h2>
     <div class="placeholder">[IMG: esquina de Ayacucho, pasaje casi vacío, de madrugada]</div>
     <p>Vuelve pasada la medianoche, cuando el pasaje ya se vació de gente y solo quedan las luces de
@@ -610,12 +644,13 @@ button{ font-family:inherit; cursor:pointer; }
     </div>
   </section>
 
-  <!-- ===================== RAMA CON CALMA — 1) donde don Hernán, sin afán (SÁBADO tarde) ===================== -->
+  <!-- ===================== RAMA CON CALMA — 1) donde don Hernán, sin afán (DOMINGO tarde) ===================== -->
   <section class="screen" data-screen="searchCalmaHernan1">
-    <div class="day-header">SÁBADO — tarde</div>
+    <div class="day-header">DOMINGO — tarde</div>
     <h2>Con calma, donde don Hernán</h2>
     <div class="placeholder">[IMG: mesa de un bar, Majo tomando algo despacio]</div>
-    <p>Después de dos días corriendo de un lado a otro, Majo decide probar lo contrario: no insistir,
+    <p>Después de tres días corriendo de un lado a otro, con la muestra ya prácticamente encima, Majo
+      decide probar lo contrario: no insistir,
       no explicar de más, solo sentarse a tomar algo despacio y dejar que la pregunta salga sola, como
       de pasada. Le pregunta a don Hernán por el cuaderno casi sin mirarlo, entre sorbo y sorbo. Él le
       dice que le suena, que le da una vuelta y averigua, y sigue con lo suyo sin apuro.</p>
@@ -627,9 +662,9 @@ button{ font-family:inherit; cursor:pointer; }
     </div>
   </section>
 
-  <!-- ===================== RAMA CON CALMA — pivote) cambia de idea (SÁBADO noche) ===================== -->
+  <!-- ===================== RAMA CON CALMA — pivote) cambia de idea (DOMINGO noche) ===================== -->
   <section class="screen" data-screen="searchCamarasRapido">
-    <div class="day-header">SÁBADO — noche</div>
+    <div class="day-header">DOMINGO — noche</div>
     <h2>Cambia de idea</h2>
     <div class="placeholder">[IMG: otro bar del pasaje, una mesera limpiando vasos]</div>
     <p>La calma le dura poco. A media conversación, sin planearlo, Majo se levanta y le pregunta a la
@@ -642,13 +677,14 @@ button{ font-family:inherit; cursor:pointer; }
     </div>
   </section>
 
-  <!-- ===================== NODO COMPARTIDO — la foto de don Hernán (DOMINGO) ===================== -->
+  <!-- ===================== NODO COMPARTIDO — la foto de don Hernán (LUNES, el mismo día de la muestra) ===================== -->
   <section class="screen" data-screen="searchHernanFoto">
-    <div class="day-header">DOMINGO</div>
+    <div class="day-header">LUNES — el día de la muestra</div>
     <h2>La foto de don Hernán</h2>
     <div class="placeholder">[IMG: foto vieja y mal revelada sobre la barra]</div>
-    <p>El domingo, sin ningún aviso, el cuaderno aparece en la barra — como aparecen las cosas en el
-      pasaje, sin que nadie diga cómo ni quién lo trajo. Majo lo abraza contra el pecho un segundo,
+    <p>El lunes, sin ningún aviso, el cuaderno aparece en la barra — como aparecen las cosas en el
+      pasaje, sin que nadie diga cómo ni quién lo trajo. Es el mismo día de la muestra: quedan horas,
+      no otro día entero, y Majo lo abraza contra el pecho un segundo,
       más aliviada de lo que esperaba, antes de darse cuenta de que don Hernán todavía no la deja ir.</p>
     <p>Le muestra una foto vieja y mal revelada, sacada de una caja que guarda detrás de la barra:
       una compañera de la universidad, de hace treinta años, que dice haber olvidado por completo
@@ -711,7 +747,9 @@ function freshState(){
   return {
     visited: { alejo:false, sofi:false, milo:false, val:false, majo:false, juana:false,
                sketchbook:false, cctv:false, donmario:false },
-    donMarioVisits: 0
+    donMarioVisits: 0,
+    sabadoVisited: { bellasartes2:false, ruda:false, hernan:false, casa:false, chatsabado:false },
+    nocheVisited: { otrobar:false, lacalle:false }
   };
 }
 state = freshState();
@@ -765,7 +803,7 @@ const ENDINGS = {
         text: 'El sobrino por fin aparece, todavía de mal genio, y hace correr la grabación de esa madrugada sin mucho ceremonial. Majo se inclina hacia la pantalla con el corazón adelantándosele al resto del cuerpo. Ahí está la mesa, la acera, el mismo ángulo torcido de siempre.\n\nCuenta las cabezas una vez: cuatro. Cree haberse equivocado y cuenta otra vez, más despacio: cuatro. Deberían ser seis. Hay dos sillas corridas hacia atrás, y frente a cada una un puesto servido —los vasos a medio tomar, los ceniceros usados—, como si alguien hubiera estado ahí toda la noche, respirando el mismo aire que los demás. Pero ambas sillas están vacías, y llevan así, congeladas en el video, desde antes de que la grabación empezara.\n\nMajo se queda mirando esas dos sillas mucho más tiempo del necesario, tratando de que el número le cuadre de alguna forma que no la asuste, hasta que el sobrino, aburrido, le pregunta si quiere que le adelante.'
       },
       rapido: {
-        day: 'SÁBADO — noche — cierre',
+        day: 'DOMINGO — noche — cierre',
         img: '[IMG: CCTV — video corto y granulado, cuatro personas, dos sillas servidas y vacías]',
         text: 'El video es más corto de lo que esperaba y la calidad es mala, pero se alcanza a ver. Cuenta las cabezas: cuatro. Deberían ser seis. Dos sillas corridas, servidas, vacías, como si nadie se hubiera molestado en acomodarlas después de que alguien se fue.\n\nEl que maneja la cámara ni se inmuta —"así queda la gente cuando amanece", le dice, encogiéndose de hombros, y sigue limpiando vasos como si acabara de mostrarle el clima de mañana— pero a Majo no se le va de la cabeza en todo el camino de vuelta, ese comentario tan tranquilo sobre algo que a ella la deja con la piel fría.'
       }
@@ -776,12 +814,12 @@ const ENDINGS = {
     instruction: 'Busca el dibujo escondido en tu fanzine.',
     variants: {
       directo: {
-        day: 'SÁBADO — cierre',
+        day: 'DOMINGO — tarde — cierre',
         img: '[IMG: esquina de Ayacucho de día, Don Mario]',
         text: 'Majo insiste ahí mismo, sin dejarlo escaparse con el tema esta vez, harta ya de las medias risas y los cambios de tema. Don Mario deja de reírse de golpe — un silencio que en él se siente más raro que cualquier cosa que haya dicho borracho — y empieza a hablar de las sombras que caminan el pasaje, de los que se sientan a una mesa y después no estuvieron nunca, como quien cuenta algo que lleva años queriendo contarle a alguien que por fin pregunte bien.\n\nY entonces se lo dice, como si fuera lo más normal del mundo: que a ella también la vio. Que esa madrugada la vio bajando sola hacia Cervantes, que un motorizado ebrio se la llevó por delante en mitad de la calle y se voló sin mirar atrás, y que después vio su sombra levantarse del piso y seguir bajando hacia el pasaje, derechito, a sentarse con los amigos, como si no hubiera pasado nada.\n\nMajo no le contesta nada. No hay nada que contestarle a eso.'
       },
       noche: {
-        day: 'SÁBADO — de madrugada — cierre',
+        day: 'DOMINGO — noche — cierre',
         img: '[IMG: esquina de Ayacucho de noche, Don Mario]',
         text: 'Don Mario no espera a que ella pregunte. En la oscuridad, sin el cigarro esta vez, habla distinto — más despacio, sin la risa de siempre — de las sombras que caminan el pasaje de noche, de los que se sientan a una mesa y después no estuvieron nunca.\n\nY entonces se lo dice, bajito, casi con lástima, como si llevara toda la noche esperando el momento de decirlo bien: que a ella también la vio. Que esa madrugada la vio bajando sola hacia Cervantes, que un motorizado ebrio se la llevó por delante en mitad de la calle y se voló, y que después vio su sombra levantarse del piso y seguir bajando hacia el pasaje, a sentarse con los amigos, como si nada. Es el único que la ve como lo que realmente es — y a esta hora, en esta esquina, con el frío subiéndole por los brazos, Majo casi le cree.'
       }
@@ -792,7 +830,7 @@ const ENDINGS = {
     instruction: 'Busca el sobre de la página 5 de tu fanzine.',
     variants: {
       default: {
-        day: 'DOMINGO → LUNES — cierre',
+        day: 'LUNES — cierre',
         img: '[IMG: sala de muestra, sketchbook abierto en el retrato uncanny]',
         text: 'El lunes, con menos horas de sueño de las que quisiera admitir, Majo monta el sketchbook abierto justo en el retrato. Se aleja un par de pasos para revisar que quede bien y se queda mirándolo ella también más tiempo del que planeaba.\n\nDurante la muestra, la gente se detiene ahí, frente a esa cara, sin saber muy bien por qué les incomoda tanto —parece de verdad, casi cualquier chica del parche, pero hay algo, un detalle que el ojo no logra señalar, que no termina de cuadrar—. Nadie lo dice en voz alta. Nadie deja de mirarla.\n\nLa muestra queda colgada toda la semana. La cara se queda ahí, mirando a todo el que pasa, y algo en Majo —que todavía no sabría explicar qué— se siente aliviado cada vez que alguien nuevo se detiene frente a ella. Ya no necesita sentarse en ninguna mesa. Le basta con que la sigan mirando.'
       }
@@ -809,6 +847,7 @@ function showScreen(name){
   });
   document.getElementById('topbar').hidden = (name === 'portada');
   if(name === 'mesa'){ renderMesa(); }
+  if(name === 'searchSabadoHub' || name === 'searchSabadoNocheHub'){ syncSpotClasses(); }
   updateTopStats();
   window.scrollTo(0,0);
 }
@@ -1035,6 +1074,86 @@ function leaveMesa(){
 }
 
 /* ---------------------------------------------------------------------
+   SÁBADO — dos hubs de exploración (día y noche), con el mismo espíritu
+   de la mesa: nada de aquí es una decisión, solo contenido para explorar
+   en cualquier orden. Don Mario NO es un hotspot acá — nunca se busca a
+   propósito; su primer encuentro es un evento forzado (searchCalle).
+   --------------------------------------------------------------------- */
+const SABADO_SPOTS = {
+  bellasartes2: {
+    titulo: 'Bellas Artes, otra vez',
+    texto: 'La señora de portería la ve venir antes de que alcance a abrir la boca, y niega con la cabeza. "Todavía no, mija. Si aparece yo la llamo." Nunca le pidió el número. Majo tampoco se lo ofrece — como si ambas supieran que no va a hacer falta.'
+  },
+  ruda: {
+    titulo: 'Ruda',
+    texto: 'La de Ruda se toma el tiempo de hacerle preguntas que a Majo no se le habían ocurrido: ¿de qué color era la pasta por dentro?, ¿tenía algo escrito en la primera hoja? Majo contesta como puede, y en el camino se da cuenta de cuánto de su propio cuaderno ya no es capaz de describir con seguridad.',
+    duda: 'Es mi cuaderno. Debería poder cerrar los ojos y verlo entero.'
+  },
+  hernan: {
+    titulo: 'El bar de don Hernán',
+    texto: 'Uno de los meseros la manda donde el dueño, un señor canoso que seca vasos sin apuro mientras la escucha. Majo le explica lo de la cámara con más detalle del necesario —la fecha, la hora aproximada, cuántos eran— como si hablar mucho compensara lo poco que en realidad sabe. Don Hernán asiente, le cree, pero: "eso lo maneja mi sobrino, y hoy libró. Venga mañana a esta hora, yo le digo que se la muestre." Antes de irse, casi por impulso, Majo saca el sketchbook y le enseña el dibujo de la pelada. Se lo muestra pensando que va a decir que no la conoce — pero don Hernán se queda mirando la hoja más tiempo del que debería.',
+    duda: 'Si no la reconoce, ¿por qué no me lo dijo de una vez?'
+  },
+  casa: {
+    titulo: 'Tu casa',
+    texto: 'Pasa por la casa a cambiarse y termina quedándose dormida en el sofá sin proponérselo, algo que no le pasa nunca en pleno día. Se despierta más cansada que antes de acostarse, con la boca pastosa y un papelito en la mano que no recuerda haber escrito — un par de palabras sueltas, con su letra, pero apuradas, como si las hubiera anotado medio dormida.',
+    duda: '¿Cuándo escribí esto? ¿Y por qué no me acuerdo de haberlo hecho?'
+  },
+  chatsabado: {
+    titulo: 'El chat',
+    texto: 'Le escribe al grupo un resumen rápido: nada todavía. Milo le manda un audio de dos segundos que no se entiende bien. Alejo, en cambio, le escribe algo que no había dicho antes: "ahora que lo pienso, la pelada tenía un encendedor plateado, se lo prestó a Sofi en algún momento y no sé si se lo devolvió." Un detalle nuevo, chiquito, que a nadie más parece importarle.',
+    duda: 'Nadie más se emociona con este dato. Yo no sé por qué a mí sí.'
+  }
+};
+
+function handleSabadoSpot(key){
+  const s = SABADO_SPOTS[key];
+  state.sabadoVisited[key] = true;
+  openModal(`
+    <h3>${s.titulo}</h3>
+    ${placeholderBox(s.titulo.toLowerCase())}
+    <p>${s.texto}</p>
+    ${s.duda ? `<p class="majo-thought">${s.duda}</p>` : ''}
+  `);
+  syncSpotClasses();
+}
+
+// Sincroniza el check ✓ de los hubs del sábado con el estado actual.
+// Se llama también al entrar a la pantalla, para que un "Volver a
+// empezar" no deje marcas visuales de una partida anterior.
+function syncSpotClasses(){
+  document.querySelectorAll('.spot-btn[data-spot]').forEach(btn=>{
+    const key = btn.dataset.spot;
+    if(state.sabadoVisited[key] !== undefined) btn.classList.toggle('visited', state.sabadoVisited[key]);
+    else if(state.nocheVisited[key] !== undefined) btn.classList.toggle('visited', state.nocheVisited[key]);
+  });
+}
+
+const NOCHE_SPOTS = {
+  otrobar: {
+    titulo: 'Otro bar',
+    texto: 'Le preguntan en la barra por gusto, sin mucha esperanza. No tienen cámara ahí, pero el que atiende le mira el sketchbook de reojo y comenta, sin darle mucha importancia: "esa cara me suena de otro lado, no sé de dónde." No dice más, y Majo tampoco insiste — hay algo en cómo lo dice que prefiere no seguir preguntando.'
+  },
+  lacalle: {
+    titulo: 'La calle',
+    texto: 'Se queda un rato afuera, en la acera, viendo pasar gente que no reconoce y que tampoco la mira a ella. El pasaje de noche se siente distinto —más ruidoso y más solo al mismo tiempo—. En algún momento le parece escuchar una risa conocida entre el bullicio, pero cuando voltea no hay nadie que le suene de nada.',
+    duda: 'Una risa que no logro ubicar. Otra vez.'
+  }
+};
+
+function handleNocheSpot(key){
+  const s = NOCHE_SPOTS[key];
+  state.nocheVisited[key] = true;
+  openModal(`
+    <h3>${s.titulo}</h3>
+    ${placeholderBox(s.titulo.toLowerCase())}
+    <p>${s.texto}</p>
+    ${s.duda ? `<p class="majo-thought">${s.duda}</p>` : ''}
+  `);
+  syncSpotClasses();
+}
+
+/* ---------------------------------------------------------------------
    FASE DE BÚSQUEDA — decisiones definitivas, sin vuelta atrás
    --------------------------------------------------------------------- */
 
@@ -1044,7 +1163,7 @@ function chooseDecision1(choice){
   if(choice === 'rendirse'){
     goToEnding('cuaderno');
   } else {
-    showScreen('searchC');
+    showScreen('searchSabadoHub');
   }
 }
 
