@@ -224,6 +224,55 @@ button{ font-family:inherit; cursor:pointer; }
 /* ---------- howto ---------- */
 .rules-list{ padding-left:20px; }
 .rules-list li{ margin-bottom:10px; }
+
+/* ---------- botón del fanzine (barra superior) ---------- */
+.btn-fanzine{
+  background:transparent; color:var(--cian); border:1px solid var(--cian);
+  padding:5px 10px; border-radius:3px; font-size:0.75rem;
+}
+.btn-fanzine:hover{ background:rgba(95,214,224,0.12); }
+
+/* ---------- fanzine (modal de páginas) ---------- */
+.fanzine-page{ min-height:220px; }
+.fanzine-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:16px; }
+.fanzine-dots{ display:flex; gap:6px; }
+.fanzine-dots button{
+  width:20px; height:20px; border-radius:50%; border:1px solid var(--muted);
+  background:transparent; color:var(--muted); font-size:0.65rem; padding:0;
+}
+.fanzine-dots button.current{ background:var(--cian); color:#0c1a1c; border-color:var(--cian); }
+.flap{
+  border:1px dashed var(--muted); border-radius:4px; padding:10px; text-align:center;
+  color:var(--muted); font-size:0.85rem; margin:10px 0; background:rgba(255,255,255,0.02);
+}
+.flap:hover{ border-color:var(--cian); color:var(--cian); }
+.hidden-reveal{ margin-top:10px; padding:10px 12px; border-left:3px solid var(--cian); background:var(--bg-panel); }
+.clave-tag{
+  display:inline-block; margin-top:8px; font-family:monospace; letter-spacing:0.15em;
+  border:1px dashed var(--cian); color:var(--cian); padding:4px 10px; border-radius:3px;
+}
+
+/* ---------- gate de clave (searchBarHernan2) ---------- */
+.clave-box{
+  background:var(--bg-panel); border:1px solid var(--muted); border-radius:6px;
+  padding:16px; margin:18px 0;
+}
+.clave-box label{ display:block; font-size:0.85rem; color:var(--muted); margin-bottom:8px; }
+.clave-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.clave-row input{
+  flex:1; min-width:140px; background:#0f0f0f; border:1px solid var(--border); color:var(--text);
+  padding:9px 10px; border-radius:3px; font-family:monospace; letter-spacing:0.1em;
+}
+.clave-feedback{ margin-top:8px; font-size:0.82rem; }
+.clave-feedback.bad{ color:var(--accent-light); }
+.clave-feedback.ok{ color:var(--cian); }
+
+/* ---------- mensaje secreto (aside opcional) ---------- */
+.secret-msg-btn{
+  background:rgba(95,214,224,0.08); border:1px solid var(--cian); color:var(--cian);
+  padding:8px 12px; border-radius:20px; font-size:0.82rem; margin:14px 0; display:inline-block;
+}
+.secret-msg-btn:hover{ background:rgba(95,214,224,0.18); }
 </style>
 </head>
 <body>
@@ -234,6 +283,7 @@ button{ font-family:inherit; cursor:pointer; }
   <div class="topbar" id="topbar" hidden>
     <div class="brand">La sexta silla · prototipo</div>
     <div class="stats" id="stat-finales"></div>
+    <button class="btn-fanzine" onclick="openFanzine()">📖 Fanzine</button>
   </div>
 
   <!-- ============================= 1. PORTADA ============================= -->
@@ -298,6 +348,9 @@ button{ font-family:inherit; cursor:pointer; }
       <li><strong>Compara.</strong> Nadie te va a resumir las versiones. Sos vos quien nota si algo no cuadra.</li>
       <li><strong>Volvé.</strong> No todo se entera a la primera. Hay gente a la que conviene preguntarle dos veces.</li>
       <li><strong>Decidí.</strong> Cuando sientas que ya viste suficiente, vas a tener que elegir por dónde sigue Majo — y esa elección no se puede deshacer.</li>
+      <li><strong>Revisá tu cuaderno.</strong> El fanzine es el mismo cuaderno de Majo. Tiene pistas que
+        acá no vas a encontrar de otra forma — incluidas algunas claves. Podés abrirlo cuando quieras
+        con el botón de arriba.</li>
     </ul>
     <div class="nav-row">
       <button class="btn" onclick="showScreen('mesa')">Ir a la mesa</button>
@@ -396,11 +449,145 @@ button{ font-family:inherit; cursor:pointer; }
   <section class="screen" data-screen="searchD">
     <div class="day-header">SÁBADO — tarde</div>
     <h2>¿Por dónde sigue Majo?</h2>
-    <p>Esta elección también es definitiva.</p>
+    <p>Esta elección también es definitiva. Ninguno de los tres caminos se resuelve hoy mismo.</p>
     <div class="branch-grid">
-      <button onclick="goToEnding('silla')">Buscar bien: preguntar en los bares si tienen cámaras</button>
-      <button onclick="goToEnding('esquina')">Volver donde ese señor raro de la esquina</button>
-      <button onclick="goToEnding('muestra')">Seguir buscando con calma, sin afán</button>
+      <button onclick="showScreen('searchBarHernan1')">Buscar bien: preguntar en los bares si tienen cámaras</button>
+      <button onclick="showScreen('searchMarioInsiste1')">Volver donde ese señor raro de la esquina</button>
+      <button onclick="showScreen('searchCalmaHernan1')">Seguir buscando con calma, sin afán</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA CÁMARAS — 1) el bar de don Hernán (SÁBADO tarde) ===================== -->
+  <section class="screen" data-screen="searchBarHernan1">
+    <div class="day-header">SÁBADO — tarde</div>
+    <h2>El bar de don Hernán</h2>
+    <div class="placeholder">[IMG: barra de un bar de Cervantes, don Hernán detrás]</div>
+    <p>Uno de los meseros la manda donde el dueño. Don Hernán la escucha con paciencia: sí tienen
+      cámara en la entrada, pero el que la maneja es el sobrino y hoy no está. "Venga mañana a esta
+      hora, yo le digo que se la muestre." Antes de irse, Majo le enseña el dibujo del sketchbook, a
+      ver si la reconoce. Don Hernán se queda mirando la hoja más tiempo del que debería.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="showScreen('searchCalle')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA CÁMARAS — 2) el camino a casa (SÁBADO noche) ===================== -->
+  <section class="screen" data-screen="searchCalle">
+    <div class="day-header">SÁBADO — noche</div>
+    <h2>El camino a casa</h2>
+    <div class="placeholder">[IMG: calle Ayacucho de noche, una figura parada a media cuadra]</div>
+    <p>Bajando por Ayacucho, alguien la para en la mitad de la cuadra. Es Don Mario, pero no en su
+      esquina de siempre — acá, caminando, algo tembloroso. Le suelta un montón de cosas sin orden:
+      un nombre que a ella no le suena, una fecha, algo de "la que faltaba en la foto". Majo no le
+      para muchas bolas; va cansada y solo quiere llegar. Pero se le queda pegado.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="showScreen('searchApagon')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA CÁMARAS — 3) otra laguna (transición forzada) ===================== -->
+  <section class="screen" data-screen="searchApagon">
+    <div class="day-header">DOMINGO — otra vez sin recordar</div>
+    <h2>Otra laguna</h2>
+    <div class="placeholder">[IMG: cuarto de Majo, mañana, ropa de anoche puesta]</div>
+    <p>No recuerda haber llegado a la casa. Se despierta con la ropa de anoche puesta y, en el chat,
+      un mensaje que nunca le dio a enviar: <em>"don mario dijo qu"</em>. No terminó la frase. No sabe
+      en qué momento dejó de escribirla.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="showScreen('searchBarHernan2')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA CÁMARAS — 4) de vuelta donde don Hernán, con clave (DOMINGO) ===================== -->
+  <section class="screen" data-screen="searchBarHernan2">
+    <div class="day-header">DOMINGO</div>
+    <h2>De vuelta donde don Hernán</h2>
+    <div class="placeholder">[IMG: barra del bar, un computador viejo al fondo]</div>
+    <p>Vuelve a la hora que quedaron. Don Hernán la reconoce y llama al sobrino, pero antes de
+      dejarla ver nada, el man pide una clave del sistema — dice que así lo dejaron configurado
+      después de un robo. "Sin eso no le muestro nada. A ver si de pronto ya la tiene."</p>
+
+    <div class="clave-box">
+      <label for="clave-input">¿Cuál es la clave?</label>
+      <div class="clave-row">
+        <input type="text" id="clave-input" placeholder="Clave" autocomplete="off">
+        <button class="btn secondary" onclick="checkClave()">Desbloquear</button>
+      </div>
+      <p class="clave-feedback" id="clave-feedback"></p>
+    </div>
+
+    <div class="branch-grid">
+      <button id="btn-insistir-camara" onclick="goToEnding('silla','oficial')" disabled>
+        Insistir en ver el video ahora (necesita la clave)
+      </button>
+      <button onclick="showScreen('searchHernanFoto')">Aceptar esperar y preguntarle por el dibujo</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA DON MARIO — 1) la esquina, otra vez (SÁBADO tarde) ===================== -->
+  <section class="screen" data-screen="searchMarioInsiste1">
+    <div class="day-header">SÁBADO — tarde</div>
+    <h2>La esquina, otra vez</h2>
+    <div class="placeholder">[IMG: Don Mario en su esquina, de día, evasivo]</div>
+    <p>Don Mario está en su puesto de siempre, pero hoy más esquivo. En cuanto ella menciona a la
+      pelada de esa noche, él cambia de tema, se ríe de algo que no viene al caso, le ofrece un trago
+      que ella no acepta.</p>
+    <div class="branch-grid">
+      <button onclick="goToEnding('esquina','directo')">Presionarlo ahí mismo</button>
+      <button onclick="showScreen('searchMarioNoche')">Volver de noche, cuando esté más solo</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA DON MARIO — 2) lo espera de noche (SÁBADO madrugada) ===================== -->
+  <section class="screen" data-screen="searchMarioNoche">
+    <div class="day-header">SÁBADO — de madrugada</div>
+    <h2>Lo espera de noche</h2>
+    <div class="placeholder">[IMG: esquina de Ayacucho, pasaje casi vacío, de madrugada]</div>
+    <p>Vuelve pasada la medianoche. El pasaje está casi vacío. Esta vez es él quien se le acerca
+      primero, sin que ella diga nada, como si la hubiera estado esperando.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="goToEnding('esquina','noche')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA CON CALMA — 1) donde don Hernán, sin afán (SÁBADO tarde) ===================== -->
+  <section class="screen" data-screen="searchCalmaHernan1">
+    <div class="day-header">SÁBADO — tarde</div>
+    <h2>Con calma, donde don Hernán</h2>
+    <div class="placeholder">[IMG: mesa de un bar, Majo tomando algo despacio]</div>
+    <p>Majo entra sin afán, pide algo de tomar, y le pregunta a don Hernán por el cuaderno como quien
+      no quiere la cosa. Él le dice que le suena, que le da una vuelta y averigua.</p>
+    <button class="secret-msg-btn" onclick="openValDM()">💬 1 mensaje nuevo — Val</button>
+    <div class="branch-grid">
+      <button onclick="showScreen('searchHernanFoto')">Seguir con calma</button>
+      <button onclick="showScreen('searchCamarasRapido')">Insistir por las cámaras después de todo</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAMA CON CALMA — pivote) cambia de idea (SÁBADO noche) ===================== -->
+  <section class="screen" data-screen="searchCamarasRapido">
+    <div class="day-header">SÁBADO — noche</div>
+    <h2>Cambia de idea</h2>
+    <div class="placeholder">[IMG: otro bar del pasaje, una mesera limpiando vasos]</div>
+    <p>Majo no quiere seguir esperando. Le pregunta a la mesera de al lado si el bar de la esquina
+      tiene cámara, y resulta que sí — el que la maneja se la muestra casi sin que ella tenga que
+      insistir mucho, medio aburrido, mientras sigue limpiando.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="goToEnding('silla','rapido')">Siguiente</button>
+    </div>
+  </section>
+
+  <!-- ===================== NODO COMPARTIDO — la foto de don Hernán (DOMINGO) ===================== -->
+  <section class="screen" data-screen="searchHernanFoto">
+    <div class="day-header">DOMINGO</div>
+    <h2>La foto de don Hernán</h2>
+    <div class="placeholder">[IMG: foto vieja y mal revelada sobre la barra]</div>
+    <p>El domingo, en la barra, aparece el cuaderno — como aparecen las cosas en el pasaje, sin que
+      nadie diga cómo. Antes de devolvérselo, don Hernán le muestra una foto vieja y mal revelada:
+      una compañera de la universidad, de hace treinta años, que dice haber olvidado por completo
+      hasta hoy.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="goToEnding('muestra')">Siguiente</button>
     </div>
   </section>
 
@@ -479,34 +666,63 @@ const TESTIMONIOS = {
 const DONMARIO_AUDIO_1 = '"…yo a usté la conozco de otra vida, mija… aquí todos ya se murieron una vez y no se han dado cuenta…"';
 const DONMARIO_AUDIO_2 = '"…la pelada que buscás… esa ya no baja caminando, esa baja de otra forma… y usté tampoco, pero eso lo entiende después."';
 
+// Algunos finales tienen más de una variante de texto/día según el camino
+// que tomó el jugador para llegar a ellos (rutas distintas, mismo final).
+// El contador "finales descubiertos" cuenta por clave, no por variante.
 const ENDINGS = {
   cuaderno: {
     title: 'El cuaderno cerrado',
-    day: 'VIERNES — cierre',
-    img: '[IMG: día de la muestra, un taburete alto exponiendo un sketchbook CLARAMENTE DIFERENTE al del inicio del juego]',
-    text: 'Majo deja de buscar. El fin de semana se va a parchar sin pensar más en el cuaderno. El lunes lleva uno viejo a la muestra y funciona igual. La noche perdida la cuenta cuando sale el tema —que se le fue la película, que estaba muy tomada—, y nadie pregunta más. La pelada de esa noche se queda por fuera de la muestra y de la conversación. Nadie la nombra, nadie la dibuja, nadie la mira.',
-    instruction: 'Hay una pista escondida en tu fanzine. Búscala.'
+    instruction: 'Hay una pista escondida en tu fanzine. Búscala.',
+    variants: {
+      default: {
+        day: 'VIERNES — cierre',
+        img: '[IMG: día de la muestra, un taburete alto exponiendo un sketchbook CLARAMENTE DIFERENTE al del inicio del juego]',
+        text: 'Majo deja de buscar. El fin de semana se va a parchar sin pensar más en el cuaderno. El lunes lleva uno viejo a la muestra y funciona igual. La noche perdida la cuenta cuando sale el tema —que se le fue la película, que estaba muy tomada—, y nadie pregunta más. La pelada de esa noche se queda por fuera de la muestra y de la conversación. Nadie la nombra, nadie la dibuja, nadie la mira.'
+      }
+    }
   },
   silla: {
     title: 'La silla vacía',
-    day: 'SÁBADO — cierre',
-    img: '[IMG: CCTV — cuatro personas sentadas, DOS sillas corridas y servidas, vacías]',
-    text: 'En un bar le dicen que tienen cámara. Majo insiste hasta que el dueño la sienta frente al computador. La grabación es de esa madrugada. Cuenta las cabezas: deberían ser seis y solo hay cuatro. Hay dos sillas corridas, y frente a cada una un puesto servido —los vasos a medio tomar, los ceniceros usados—, como si alguien hubiera estado ahí toda la noche. Pero ambas sillas están vacías. Majo se queda mirando esas dos sillas hasta que el dueño le pregunta si quiere que le adelante.',
-    instruction: 'Levanta la solapa de la página 3 de tu fanzine.'
+    instruction: 'Levanta la solapa de la página 3 de tu fanzine.',
+    variants: {
+      oficial: {
+        day: 'DOMINGO — cierre',
+        img: '[IMG: CCTV — cuatro personas sentadas, DOS sillas corridas y servidas, vacías]',
+        text: 'El sobrino por fin aparece y revisa la grabación de esa madrugada. Cuenta las cabezas: deberían ser seis y solo hay cuatro. Hay dos sillas corridas, y frente a cada una un puesto servido —los vasos a medio tomar, los ceniceros usados—, como si alguien hubiera estado ahí toda la noche. Pero ambas sillas están vacías. Majo se queda mirando esas dos sillas hasta que el man le pregunta si quiere que le adelante.'
+      },
+      rapido: {
+        day: 'SÁBADO — noche — cierre',
+        img: '[IMG: CCTV — video corto y granulado, cuatro personas, dos sillas servidas y vacías]',
+        text: 'El video es más corto de lo que esperaba y la calidad es mala, pero se alcanza a ver. Cuenta las cabezas: deberían ser seis y solo hay cuatro. Dos sillas corridas, servidas, vacías. El que maneja la cámara ni se inmuta —"así queda la gente cuando amanece", le dice, y sigue limpiando— pero a Majo no se le va de la cabeza en todo el camino a su casa.'
+      }
+    }
   },
   esquina: {
     title: 'La esquina',
-    day: 'SÁBADO — cierre',
-    img: '[IMG: esquina de Ayacucho de noche, Don Mario]',
-    text: 'Majo vuelve donde don Mario. Él le habla de las sombras que caminan el pasaje, de los que se sientan a una mesa y después no estuvieron nunca. Y entonces le dice, como si fuera lo más normal, que a ella también la vio: esa madrugada la vio bajando sola hacia Cervantes, que un motorizado ebrio se la llevó por delante en mitad de la calle y se voló, y que su sombra se levantó del piso y siguió bajando hacia el pasaje, a sentarse con los amigos, como si nada. Don Mario es el único que la ve como lo que realmente es.',
-    instruction: 'Busca el dibujo escondido en tu fanzine.'
+    instruction: 'Busca el dibujo escondido en tu fanzine.',
+    variants: {
+      directo: {
+        day: 'SÁBADO — cierre',
+        img: '[IMG: esquina de Ayacucho de día, Don Mario]',
+        text: 'Majo insiste ahí mismo, sin dejarlo escaparse con el tema. Don Mario deja de reírse de golpe y le habla de las sombras que caminan el pasaje, de los que se sientan a una mesa y después no estuvieron nunca. Y entonces le dice, como si fuera lo más normal, que a ella también la vio: esa madrugada la vio bajando sola hacia Cervantes, que un motorizado ebrio se la llevó por delante en mitad de la calle y se voló, y que su sombra se levantó del piso y siguió bajando hacia el pasaje, a sentarse con los amigos, como si nada.'
+      },
+      noche: {
+        day: 'SÁBADO — de madrugada — cierre',
+        img: '[IMG: esquina de Ayacucho de noche, Don Mario]',
+        text: 'Don Mario no espera a que ella pregunte. Le habla de las sombras que caminan el pasaje de noche, de los que se sientan a una mesa y después no estuvieron nunca — y entonces le dice, bajito, casi con lástima, que a ella también la vio: esa madrugada la vio bajando sola hacia Cervantes, que un motorizado ebrio se la llevó por delante en mitad de la calle y se voló, y que su sombra se levantó del piso y siguió bajando hacia el pasaje, a sentarse con los amigos, como si nada. Es el único que la ve como lo que realmente es — y a esta hora, en esta esquina, ella casi le cree.'
+      }
+    }
   },
   muestra: {
     title: 'La muestra',
-    day: 'DOMINGO → LUNES — cierre',
-    img: '[IMG: sala de muestra, sketchbook abierto en el retrato uncanny]',
-    text: 'El sábado Majo entra al bar de don Hernán a preguntar por el cuaderno. Antes de irse le muestra el retrato; a él le suena esa cara pero no la ubica, y le dice que vuelva. El domingo el cuaderno aparece por ahí, en una barra, como aparecen las cosas en el pasaje. Don Hernán le muestra una foto vieja y mal revelada: una compañera de universidad de hace treinta años que había olvidado por completo. El lunes Majo monta el sketchbook abierto en el retrato. La gente se detiene en esa cara sin saber por qué incomoda —parece de verdad pero no—. La muestra queda colgada toda la semana. La cara se queda ahí, mirando a todo el que pasa. Ya no necesita sentarse en ninguna mesa: le basta con que la sigan mirando.',
-    instruction: 'Busca el sobre de la página 5 de tu fanzine.'
+    instruction: 'Busca el sobre de la página 5 de tu fanzine.',
+    variants: {
+      default: {
+        day: 'DOMINGO → LUNES — cierre',
+        img: '[IMG: sala de muestra, sketchbook abierto en el retrato uncanny]',
+        text: 'El lunes Majo monta el sketchbook abierto en el retrato. La gente se detiene en esa cara sin saber por qué incomoda —parece de verdad pero no—. La muestra queda colgada toda la semana. La cara se queda ahí, mirando a todo el que pasa. Ya no necesita sentarse en ninguna mesa: le basta con que la sigan mirando.'
+      }
+    }
   }
 };
 
@@ -590,12 +806,21 @@ function openMorningClue(key){
       text:'Revisás la maleta con la que saliste anoche. Nada. Ni rastro del cuaderno.'
     },
     transporte: {
-      label:'app de transporte — carro pedido a las 3:14 a.m., hora de llegada en blanco',
-      text:'La app muestra la hora en la que pediste el carro: 3:14 a.m. Después, nada. La hora de llegada está en blanco, un hueco que la app no explica.' + late
+      label:'el teléfono',
+      text:'La app de transporte muestra la hora en la que pediste el carro: 3:14 a.m. Después, nada. La hora de llegada está en blanco, un hueco que la app no explica.' + late
     }
   };
   const c = clues[key];
-  openModal(`<h3>${c.label.split(',')[0]}</h3>${placeholderBox(c.label)}<p>${c.text}</p>`);
+  if(key === 'transporte'){
+    openModal(`<h3>El teléfono</h3>
+      ${placeholderBox('app de transporte — 3:14 a.m., hora de llegada en blanco')}
+      <p>${c.text}</p>
+      <p style="margin-top:14px; color:var(--muted); font-size:0.85rem;">Buzón de voz: 1 mensaje nuevo, recibido viernes 3:15 a.m.</p>
+      ${audioButton('mensaje de voz', '(silencio, ruido de calle de fondo, se corta antes de que se oiga nada)')}
+    `);
+  } else {
+    openModal(`<h3>${c.label.split(',')[0]}</h3>${placeholderBox(c.label)}<p>${c.text}</p>`);
+  }
 }
 
 /* ---------------------------------------------------------------------
@@ -734,17 +959,19 @@ function chooseDecision1(choice){
 }
 
 /* ---------------------------------------------------------------------
-   FINALES
+   FINALES — cada uno puede tener más de una variante de ruta
    --------------------------------------------------------------------- */
-function goToEnding(key){
+function goToEnding(key, variant){
+  variant = variant || 'default';
   const alreadySeen = endingsSeen.has(key);
   endingsSeen.add(key);
 
   const e = ENDINGS[key];
-  document.getElementById('final-day').textContent = e.day;
+  const v = e.variants[variant];
+  document.getElementById('final-day').textContent = v.day;
   document.getElementById('final-title').textContent = e.title;
-  document.getElementById('final-image').textContent = e.img;
-  document.getElementById('final-text').textContent = e.text;
+  document.getElementById('final-image').textContent = v.img;
+  document.getElementById('final-text').textContent = v.text;
   document.getElementById('final-instruction').textContent = e.instruction;
   document.getElementById('final-repeat').classList.toggle('hidden', !alreadySeen);
 
@@ -753,6 +980,131 @@ function goToEnding(key){
 
   closeModal();
   showScreen('final');
+}
+
+/* ---------------------------------------------------------------------
+   LA CLAVE — se consigue explorando el fanzine (página 3, la solapa).
+   Sin ella, igual hay un camino: "aceptar esperar" nunca se bloquea.
+   --------------------------------------------------------------------- */
+const CLAVE_CORRECTA = 'C-06';
+function checkClave(){
+  const input = document.getElementById('clave-input');
+  const feedback = document.getElementById('clave-feedback');
+  const valor = (input.value || '').trim().toUpperCase();
+  const btn = document.getElementById('btn-insistir-camara');
+  if(valor === CLAVE_CORRECTA){
+    feedback.textContent = 'Esa es. El sobrino asiente y abre el programa de las cámaras.';
+    feedback.className = 'clave-feedback ok';
+    btn.disabled = false;
+    btn.textContent = 'Insistir en ver el video ahora';
+  } else {
+    feedback.textContent = 'Esa no es la clave. ¿La buscaste bien en tu cuaderno?';
+    feedback.className = 'clave-feedback bad';
+  }
+}
+
+/* ---------------------------------------------------------------------
+   MENSAJE SECRETO — un aside opcional, no cambia ningún final.
+   --------------------------------------------------------------------- */
+function openValDM(){
+  openModal(`
+    <h3>Val — mensaje directo</h3>
+    ${placeholderBox('foto borrosa, mesa de noche, una silla de más al fondo')}
+    <p>"oye rarísimo esto, encontré esta foto de esa noche en mi rollo. ni me acuerdo quién la
+      tomó ni por qué salió así de movida"</p>
+  `);
+}
+
+/* ---------------------------------------------------------------------
+   EL FANZINE — el mismo cuaderno de Majo, se abre en cualquier orden.
+   Vive fuera del recorrido principal: abrir y cerrar el fanzine no
+   cuenta como "volver", es solo consultar un objeto en cualquier momento.
+   --------------------------------------------------------------------- */
+let fanzinePage = 0;
+const FANZINE_PAGES = [
+  {
+    titulo: 'Portada',
+    cuerpo: `${placeholderBox('portada del sketchbook — título a mano, cinta en la esquina')}
+      <p>LA SEXTA SILLA. Majo. Cervantes, Medellín. 2026.</p>`
+  },
+  {
+    titulo: 'El cuaderno',
+    cuerpo: `${placeholderBox('bocetos pequeños de Cervantes: calle, mesa, vasos, sillas')}
+      <p>"Este cuaderno es de Majo. Si lo encontraste, probablemente ella ya no lo está buscando."</p>
+      <p><strong>NO ORDENAR.</strong></p>
+      <p style="color:var(--muted); font-style:italic;">Frase escondida entre los garabatos: "Algunas cosas solo existen si las recuerdas."</p>`
+  },
+  {
+    titulo: 'La noche',
+    cuerpo: `${placeholderBox('la mesa vista desde arriba: 5 vasos, 5 personas esquemáticas, 5 sillas')}
+      <p>Anotaciones al margen: <em>23:47 · 5 vasos · Val llegó tarde · Alejo estaba tomando · ¿Éramos cinco?</em></p>
+      <div class="flap" id="flap-3" onclick="liftFlap()">🔖 LEVANTA AQUÍ</div>
+      <div id="flap-3-reveal"></div>`
+  },
+  {
+    titulo: 'Las versiones',
+    cuerpo: `${placeholderBox('papelitos pegados con fragmentos de testimonios')}
+      <p>VAL: "Éramos cinco." · ALEJO: "No, éramos seis." · MILO: "Yo creo que ella estaba ahí…" ·
+        SOFI: "Yo… no sé." · DON MARIO: "Yo no la vi."</p>
+      <p style="color:var(--muted); font-size:0.85rem;">Las versiones no coinciden entre sí.</p>`
+  },
+  {
+    titulo: 'La fotografía',
+    cuerpo: `${placeholderBox('sobre pegado a la página, "NO ABRIR · 1997"')}
+      <p>"¿Quién se sentó aquí?"</p>
+      <div class="flap" id="flap-5" onclick="openSobre()">✉️ SACAR LA FOTO DEL SOBRE</div>
+      <div id="flap-5-reveal"></div>`
+  },
+  {
+    titulo: 'El retrato (empieza)',
+    cuerpo: `${placeholderBox('un ojo grande a lápiz, bocetos tachados alrededor')}
+      <p>"A veces dibujar es la única forma de recordar." · "No sé por qué sigo dibujándola."</p>
+      ${audioButton('QR en el dibujo', 'ruido de bar, vasos, voces… una voz dice algo incompleto y se corta')}`
+  },
+  {
+    titulo: 'La última pista',
+    cuerpo: `${placeholderBox('el rostro de Juana casi completo')}
+      <p>"Ahora sí me acuerdo de su cara." · "¿Por qué no recuerdo haberla dibujado?"</p>
+      <p style="color:var(--muted); font-size:0.85rem;">Entre los trazos: un número, una palabra tachada, una referencia a la sexta silla.</p>`
+  },
+  {
+    titulo: 'Contraportada',
+    cuerpo: `${placeholderBox('pliego desplegable, rostro completo al abrirlo entero')}
+      <p>"Algunas cosas solo existen si las recuerdas."</p>
+      <p class="cian-note">Casi escondido en la esquina: "Ahora me recuerdas tú."</p>`
+  }
+];
+
+function openFanzine(){
+  renderFanzine(fanzinePage);
+}
+function renderFanzine(i){
+  fanzinePage = i;
+  const p = FANZINE_PAGES[i];
+  const dots = FANZINE_PAGES.map((_, idx) =>
+    `<button class="${idx===i?'current':''}" onclick="renderFanzine(${idx})">${idx+1}</button>`
+  ).join('');
+  openModal(`
+    <h3>Fanzine — pág. ${i+1}: ${p.titulo}</h3>
+    <div class="fanzine-page">${p.cuerpo}</div>
+    <div class="fanzine-nav">
+      <button class="btn secondary" ${i===0?'disabled':''} onclick="renderFanzine(${i-1})">← anterior</button>
+      <div class="fanzine-dots">${dots}</div>
+      <button class="btn secondary" ${i===FANZINE_PAGES.length-1?'disabled':''} onclick="renderFanzine(${i+1})">siguiente →</button>
+    </div>
+  `);
+}
+function liftFlap(){
+  document.getElementById('flap-3-reveal').innerHTML =
+    `<div class="hidden-reveal"><p>Aparece una silla más. Debajo, con otra letra: <em>"Yo recuerdo seis."</em></p>
+     <span class="clave-tag">CLAVE: C-06</span></div>`;
+  document.getElementById('flap-3').style.display = 'none';
+}
+function openSobre(){
+  document.getElementById('flap-5-reveal').innerHTML =
+    `<div class="hidden-reveal">${placeholderBox('foto análoga de los noventa, la cara no se ve')}
+     <p>Atrás, a mano: <em>"JUANA — ¿Quién era ella?"</em></p></div>`;
+  document.getElementById('flap-5').style.display = 'none';
 }
 </script>
 </body>
